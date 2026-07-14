@@ -1,74 +1,248 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import sys
+from sklearn.impute import KNNImputer
 
-# 1. Aşama: Parametrelerin Tanımlanması
-# Veri çekilecek hedef hisse senetleri (BIST100)
-hisseler = ['THYAO.IS', 'EREGL.IS', 'AKBNK.IS', 'GARAN.IS', 'BIMAS.IS', 'TUPRS.IS']
-# Makroekonomik dışsal değişkenler
-dis_degiskenler = ['TRY=X', '^VIX']
+# ta kütüphanesi modülleri
+from ta.trend import SMAIndicator, MACD
+from ta.momentum import RSIIndicator, ROCIndicator
 
-# 10 yıllık tarih aralığı (yfinance bitiş tarihini hariç tuttuğu için 2025-01-01 yazılmıştır)
-start_date = '2015-01-01'
-end_date = '2025-01-01'
+# --- 1. Parametrelerin Tanımlanması ---
+HISSELER = ['THYAO.IS', 'EREGL.IS', 'AKBNK.IS', 'GARAN.IS', 'BIMAS.IS', 'TUPRS.IS']
+DIS_DEGISKENLER = ['TRY=X', '^VIX']
+START_DATE = '2015-01-01'
+END_DATE = '2025-01-01'
 
-# Tüm ticker'ları birleştirerek yfinance üzerinden tek seferde çekiyoruz
-tum_tickerlar = hisseler + dis_degiskenler
-print("Veriler Yahoo Finance üzerinden indiriliyor...")
-df_raw = yf.download(tum_tickerlar, start=start_date, end=end_date)
-
-# 2. Aşama: Eksik Verilerin Doldurulması
-# Farklı takvimler ve resmi tatiller sebebiyle oluşabilecek NaN değerleri dolduruyoruz.
-# Önce önceki günün verisiyle (forward fill), eğer başta hala boşluk varsa sonraki günün verisiyle (backward fill) doldurulur.
-df_filled = df_raw.ffill().bfill()
-
-# 3. Aşama: Verilerin Uzun Formata (Long Format) Dönüştürülmesi
-# Her hisse senedi için ayrı bir DataFrame oluşturup, bunları dikeyde birleştireceğiz.
-uzun_format_listesi = []
-
-for hisse in hisseler:
-    # Hisse senedine ait fiyat ve hacim verilerini alıyoruz
-    hisse_df = pd.DataFrame({
-        'Open': df_filled[('Open', hisse)],
-        'High': df_filled[('High', hisse)],
-        'Low': df_filled[('Low', hisse)],
-        'Close': df_filled[('Close', hisse)],
-        'Volume': df_filled[('Volume', hisse)]
-    })
+def fetch_raw_data():
+    """Yahoo Finance'ten ham fiyat ve makro verileri çeker."""
+    print("Veriler Yahoo Finance üzerinden indiriliyor...")
+    df_stocks = yf.download(HISSELER, start=START_DATE, end=END_DATE, auto_adjust=True)
     
-    # Tarih indeksini sütun haline getiriyoruz
-    hisse_df = hisse_df.reset_index()
-    hisse_df.rename(columns={'Date': 'Tarih'}, inplace=True)
+    if len(df_stocks) == 0:
+        print("HATA: Yahoo Finance'ten hisse verisi çekilemedi. Bağlantınızı veya ticker'ları kontrol edin.")
+        sys.exit(1)
+        
+    assert isinstance(df_stocks.columns, pd.MultiIndex), "Beklenmeyen veri formatı: Sütunlar MultiIndex değil!"
     
-    # Tarih formatını sadeleştiriyoruz (YYYY-MM-DD)
-    hisse_df['Tarih'] = pd.to_datetime(hisse_df['Tarih']).dt.date
+    df_macro = yf.download(DIS_DEGISKENLER, start=START_DATE, end=END_DATE, auto_adjust=True)
     
-    # Hisse kodunu ekliyoruz
-    hisse_df['Hisse_Kodu'] = hisse
+    if len(df_macro) == 0:
+        print("UYARI: Makro değişkenler çekilemedi. Sütunlar boş kalacak.")
+        
+    return df_stocks, df_macro
+
+def align_and_prepare_raw_df(df_stocks, df_macro):
+    """Verileri uzun formata getirir ve master takvime oturtur (NaN doldurma henüz yapılmaz)."""
+    master_calendar = df_stocks.index
+    df_macro_aligned = df_macro.reindex(master_calendar)
     
-    # Dışsal makro değişkenlerin (USD_TRY ve VIX) kapanış değerlerini ekliyoruz
-    hisse_df['USD_TRY'] = df_filled[('Close', 'TRY=X')].values
-    hisse_df['VIX'] = df_filled[('Close', '^VIX')].values
+    uzun_format_listesi = []
     
-    # Listeye ekliyoruz
-    uzun_format_listesi.append(hisse_df)
+    for hisse in HISSELER:
+        hisse_df = pd.DataFrame({
+            'Tarih': master_calendar,
+            'Open': df_stocks[('Open', hisse)].values,
+            'High': df_stocks[('High', hisse)].values,
+            'Low': df_stocks[('Low', hisse)].values,
+            'Close': df_stocks[('Close', hisse)].values,
+            'Volume': df_stocks[('Volume', hisse)].values
+        })
+        
+        # Makro değişkenleri NaN ile eklenecek. Doldurma fonksiyonları buraları da dolduracak.
+        if len(df_macro_aligned) > 0 and ('Close', 'TRY=X') in df_macro_aligned.columns:
+            hisse_df['USD_TRY'] = df_macro_aligned[('Close', 'TRY=X')].values
+        else:
+            hisse_df['USD_TRY'] = np.nan
+            
+        if len(df_macro_aligned) > 0 and ('Close', '^VIX') in df_macro_aligned.columns:
+            hisse_df['VIX'] = df_macro_aligned[('Close', '^VIX')].values
+        else:
+            hisse_df['VIX'] = np.nan
+            
+        hisse_df['Hisse_Kodu'] = hisse
+        uzun_format_listesi.append(hisse_df)
+        
+    final_df = pd.concat(uzun_format_listesi, ignore_index=True)
+    final_df['Tarih'] = pd.to_datetime(final_df['Tarih']) # interpolate için datetime şart
+    return final_df
 
-# Tüm hisse DataFrame'lerini tek bir veri setinde birleştiriyoruz
-bist100_df = pd.concat(uzun_format_listesi, ignore_index=True)
+# --- 2. Eksik Veri Doldurma (Imputation) Fonksiyonları ---
 
-# Sütunları istenen sırada düzenliyoruz
-kolon_sirasi = ['Tarih', 'Hisse_Kodu', 'Open', 'High', 'Low', 'Close', 'Volume', 'USD_TRY', 'VIX']
-bist100_df = bist100_df[kolon_sirasi]
+def apply_ffill(df):
+    """Versiyon A: Yalnızca ffill (baseline) ile eksik verileri doldurur."""
+    print("Versiyon A (Forward Fill) hesaplanıyor...")
+    filled_df = df.copy()
+    columns_to_fill = ['Open', 'High', 'Low', 'Close', 'Volume', 'USD_TRY', 'VIX']
+    
+    # Sadece ilgili kolonları ffill ile güncelliyoruz, diğer sütunlara (Hisse_Kodu, Tarih) dokunmuyoruz.
+    filled_df[columns_to_fill] = filled_df.groupby('Hisse_Kodu')[columns_to_fill].ffill()
+    
+    filled_df = filled_df.dropna(subset=['Close']) # Başta ffill alamayıp boş kalanları at
+    return filled_df.reset_index(drop=True)
 
-# 4. Aşama: Verilerin Doğrulanması ve Kaydedilmesi
-# Veri setinin düzgün oluştuğunu doğrulamak için ilk ve son satırları konsola yazdırıyoruz.
-print("\n--- Veri Seti İlk 5 Satır (df.head()) ---")
-print(bist100_df.head())
+def apply_interpolation(df):
+    """Versiyon B: Zaman endeksine duyarlı doğrusal (linear) interpolasyon."""
+    print("Versiyon B (Linear Interpolation) hesaplanıyor...")
+    filled_df = df.copy()
+    columns_to_fill = ['Open', 'High', 'Low', 'Close', 'Volume', 'USD_TRY', 'VIX']
+    
+    dfs_to_concat = []
+    
+    for hisse, group in filled_df.groupby('Hisse_Kodu'):
+        group = group.set_index('Tarih')
+        group[columns_to_fill] = group[columns_to_fill].interpolate(method='time')
+        group = group.reset_index()
+        dfs_to_concat.append(group)
+        
+    filled_df = pd.concat(dfs_to_concat, ignore_index=True)
+    filled_df = filled_df.dropna(subset=['Close'])
+    return filled_df.reset_index(drop=True)
 
-print("\n--- Veri Seti Son 5 Satır (df.tail()) ---")
-print(bist100_df.tail())
+def apply_knn_imputation(df):
+    """Versiyon C: Makine öğrenmesi tabanlı KNN Imputation (k=5)."""
+    print("Versiyon C (KNN Imputer) hesaplanıyor...")
+    filled_df = df.copy()
+    columns_to_fill = ['Open', 'High', 'Low', 'Close', 'Volume', 'USD_TRY', 'VIX']
+    imputer = KNNImputer(n_neighbors=5)
+    
+    dfs_to_concat = []
+    
+    for hisse, group in filled_df.groupby('Hisse_Kodu'):
+        if group[columns_to_fill].isna().all().all():
+            dfs_to_concat.append(group)
+            continue
+            
+        imputed_values = imputer.fit_transform(group[columns_to_fill])
+        group_copy = group.copy()
+        for i, col in enumerate(columns_to_fill):
+            group_copy[col] = imputed_values[:, i]
+        dfs_to_concat.append(group_copy)
+        
+    filled_df = pd.concat(dfs_to_concat, ignore_index=True)
+    filled_df = filled_df.dropna(subset=['Close'])
+    return filled_df.reset_index(drop=True)
 
-# Sonucu CSV dosyası olarak kaydediyoruz
-csv_dosya_adi = "bist100_sektorel_veri.csv"
-bist100_df.to_csv(csv_dosya_adi, index=False, encoding='utf-8')
-print(f"\nVeriler başarıyla çekildi ve '{csv_dosya_adi}' dosyasına kaydedildi.")
+# --- 3. Teknik Gösterge Fonksiyonu ---
+
+def calculate_technical_indicators(df):
+    """Eksik verileri doldurulmuş dataframe'e teknik göstergeleri hesaplar."""
+    dfs_to_concat = []
+    
+    for hisse, group in df.groupby('Hisse_Kodu'):
+        hisse_df = group.copy()
+        
+        # Logaritmik Getiri
+        hisse_df['Gunluk_Getiri'] = np.log(hisse_df['Close'] / hisse_df['Close'].shift(1))
+        
+        # Volatilite (Ham fiyat değil, getiri üzerinden standart sapma)
+        hisse_df['Volatilite_10'] = hisse_df['Gunluk_Getiri'].rolling(window=10).std()
+        
+        # Hareketli Ortalamalar (MA)
+        hisse_df['MA_10'] = SMAIndicator(close=hisse_df['Close'], window=10).sma_indicator()
+        hisse_df['MA_50'] = SMAIndicator(close=hisse_df['Close'], window=50).sma_indicator()
+        
+        # Momentum (Rate of Change)
+        hisse_df['Momentum_10'] = ROCIndicator(close=hisse_df['Close'], window=10).roc()
+        
+        # RSI (14)
+        hisse_df['RSI_14'] = RSIIndicator(close=hisse_df['Close'], window=14).rsi()
+        
+        # MACD (12, 26, 9)
+        macd_obj = MACD(close=hisse_df['Close'], window_slow=26, window_fast=12, window_sign=9)
+        hisse_df['MACD'] = macd_obj.macd()
+        hisse_df['MACD_Signal'] = macd_obj.macd_signal()
+        hisse_df['MACD_Histogram'] = macd_obj.macd_diff()
+        
+        dfs_to_concat.append(hisse_df)
+        
+    df_out = pd.concat(dfs_to_concat, ignore_index=True)
+    
+    # Göstergelerin geçmiş periyotlara ihtiyaç duymasından oluşan başlangıçtaki NaN'ları sil
+    df_out = df_out.dropna()
+    return df_out.reset_index(drop=True)
+
+# --- 4. Veri Bölme ve Dosya Kaydetme Fonksiyonu ---
+
+def generate_model_specific_files(df, suffix):
+    """Train/Test ayrımını yapar ve method'a özgü 3 adet dosyayı kaydeder."""
+    dfs_to_concat = []
+    
+    for hisse, group in df.groupby('Hisse_Kodu'):
+        group_copy = group.copy()
+        split_idx = int(len(group_copy) * 0.8)
+        group_copy['Set'] = 'Train'
+        group_copy.iloc[split_idx:, group_copy.columns.get_loc('Set')] = 'Test'
+        dfs_to_concat.append(group_copy)
+        
+    df_out = pd.concat(dfs_to_concat, ignore_index=True)
+    
+    # Sütunları düzenle, Tarihi okunabilir formata çevir
+    df_out['Tarih'] = pd.to_datetime(df_out['Tarih']).dt.date
+    temel_kolonlar = ['Tarih', 'Hisse_Kodu', 'Set', 'Open', 'High', 'Low', 'Close', 'Volume', 'USD_TRY', 'VIX']
+    diger_kolonlar = [col for col in df_out.columns if col not in temel_kolonlar]
+    df_out = df_out[temel_kolonlar + diger_kolonlar]
+
+    # 1. LSTM/GRU Formatı
+    df_out.to_csv(f"lstm_gru_data_{suffix}.csv", index=False, encoding='utf-8')
+    
+    # 2. ARIMA/Prophet Sade Formatı
+    arima_df = df_out[['Tarih', 'Hisse_Kodu', 'Close']]
+    arima_df.to_csv(f"arima_prophet_data_{suffix}.csv", index=False, encoding='utf-8')
+    
+    # 3. Prophet Özel Formatı (ds, y)
+    prophet_df = arima_df.rename(columns={'Tarih': 'ds', 'Close': 'y'})
+    prophet_df.to_csv(f"prophet_format_data_{suffix}.csv", index=False, encoding='utf-8')
+
+# --- 5. Ana Yürütme Bloğu ---
+
+if __name__ == "__main__":
+    df_stocks, df_macro = fetch_raw_data()
+    raw_df = align_and_prepare_raw_df(df_stocks, df_macro)
+    
+    # Versiyon A: FFill
+    df_ffill = apply_ffill(raw_df)
+    df_ffill_ind = calculate_technical_indicators(df_ffill)
+    generate_model_specific_files(df_ffill_ind.copy(), "ffill")
+    
+    # Versiyon B: Interpolate
+    df_interp = apply_interpolation(raw_df)
+    df_interp_ind = calculate_technical_indicators(df_interp)
+    generate_model_specific_files(df_interp_ind.copy(), "interpolate")
+    
+    # Versiyon C: KNN
+    df_knn = apply_knn_imputation(raw_df)
+    df_knn_ind = calculate_technical_indicators(df_knn)
+    generate_model_specific_files(df_knn_ind.copy(), "knn")
+    
+    print("\n[TAMAM] Toplam 9 adet CSV dosyası başarıyla üretildi.")
+    
+    # --- Karşılaştırma Bloğu ---
+    print("\n--- İMPUTASYON YÖNTEMLERİ KARŞILAŞTIRMA ÖZETİ ---")
+    
+    # Satırların tarih olarak mükemmel hizalanması için merge işlemi uyguluyoruz.
+    compare_df = pd.merge(df_ffill_ind[['Tarih', 'Hisse_Kodu', 'Close']], 
+                          df_interp_ind[['Tarih', 'Hisse_Kodu', 'Close']], 
+                          on=['Tarih', 'Hisse_Kodu'], 
+                          suffixes=('_ffill', '_interp'))
+                          
+    compare_df = pd.merge(compare_df, 
+                          df_knn_ind[['Tarih', 'Hisse_Kodu', 'Close']], 
+                          on=['Tarih', 'Hisse_Kodu'])
+    compare_df.rename(columns={'Close': 'Close_knn'}, inplace=True)
+    
+    diff_ffill_interp = (compare_df['Close_ffill'] != compare_df['Close_interp']).sum()
+    diff_ffill_knn = (compare_df['Close_ffill'] != compare_df['Close_knn']).sum()
+    
+    # Sadece fark olan satırların mutlak fark ortalaması (Yoksa sıfırlar ortalamayı çok düşürür)
+    mask_interp = compare_df['Close_ffill'] != compare_df['Close_interp']
+    mad_ffill_interp = np.abs(compare_df.loc[mask_interp, 'Close_ffill'] - compare_df.loc[mask_interp, 'Close_interp']).mean()
+    if pd.isna(mad_ffill_interp): mad_ffill_interp = 0.0
+
+    mask_knn = compare_df['Close_ffill'] != compare_df['Close_knn']
+    mad_ffill_knn = np.abs(compare_df.loc[mask_knn, 'Close_ffill'] - compare_df.loc[mask_knn, 'Close_knn']).mean()
+    if pd.isna(mad_ffill_knn): mad_ffill_knn = 0.0
+    
+    print(f"1. FFill vs. Linear Interpolation : {diff_ffill_interp} farklı hücre. (Farklı olanların Ortalama Mutlak Farkı: {mad_ffill_interp:.4f})")
+    print(f"2. FFill vs. KNN Imputer          : {diff_ffill_knn} farklı hücre. (Farklı olanların Ortalama Mutlak Farkı: {mad_ffill_knn:.4f})")
+    print("\nBu farklılık metrikleri makalede 'eksik veri stratejisinin modele etkisi' başlığı altında ampirik veri olarak kullanılabilir.")
