@@ -5,8 +5,10 @@ import sys
 from sklearn.impute import KNNImputer
 
 # ta kütüphanesi modülleri
-from ta.trend import SMAIndicator, MACD
-from ta.momentum import RSIIndicator, ROCIndicator
+from ta.trend import SMAIndicator, EMAIndicator, MACD, ADXIndicator, CCIIndicator
+from ta.momentum import RSIIndicator, ROCIndicator, WilliamsRIndicator, StochasticOscillator
+from ta.volatility import AverageTrueRange, BollingerBands
+from ta.volume import OnBalanceVolumeIndicator
 
 # --- 1. Parametrelerin Tanımlanması ---
 HISSELER = ['THYAO.IS', 'EREGL.IS', 'AKBNK.IS', 'GARAN.IS', 'BIMAS.IS', 'TUPRS.IS']
@@ -153,6 +155,37 @@ def calculate_technical_indicators(df):
         hisse_df['MACD'] = macd_obj.macd()
         hisse_df['MACD_Signal'] = macd_obj.macd_signal()
         hisse_df['MACD_Histogram'] = macd_obj.macd_diff()
+        
+        # --- Yeni Eklenen Teknik Göstergeler ---
+        
+        # EMA (Üstel Hareketli Ortalama - 20 günlük)
+        hisse_df['EMA_20'] = EMAIndicator(close=hisse_df['Close'], window=20).ema_indicator()
+        
+        # ATR (Ortalama Gerçek Aralık - 14 günlük volatilite ölçüsü)
+        hisse_df['ATR_14'] = AverageTrueRange(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], window=14).average_true_range()
+        
+        # Bollinger Bantları (20 günlük, 2 standart sapma)
+        bb = BollingerBands(close=hisse_df['Close'], window=20, window_dev=2)
+        hisse_df['BB_Upper'] = bb.bollinger_hband()
+        hisse_df['BB_Lower'] = bb.bollinger_lband()
+        hisse_df['BB_Width'] = bb.bollinger_wband()
+        
+        # ADX (Ortalama Yönsel Hareket Endeksi - trend gücü)
+        hisse_df['ADX_14'] = ADXIndicator(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], window=14).adx()
+        
+        # CCI (Emtia Kanal Endeksi - fiyatın ortalamadan sapması)
+        hisse_df['CCI_20'] = CCIIndicator(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], window=20).cci()
+        
+        # Williams %R (aşırı alım/satım göstergesi)
+        hisse_df['Williams_R'] = WilliamsRIndicator(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], lbp=14).williams_r()
+        
+        # OBV (Denge Hacmi - hacim bazlı trend teyidi)
+        hisse_df['OBV'] = OnBalanceVolumeIndicator(close=hisse_df['Close'], volume=hisse_df['Volume']).on_balance_volume()
+        
+        # Stochastic Oscillator (momentum göstergesi)
+        stoch = StochasticOscillator(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], window=14, smooth_window=3)
+        hisse_df['Stoch_K'] = stoch.stoch()
+        hisse_df['Stoch_D'] = stoch.stoch_signal()
         
         dfs_to_concat.append(hisse_df)
         
