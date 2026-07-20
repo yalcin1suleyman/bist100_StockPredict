@@ -55,7 +55,7 @@ def run_shap_analysis(file_path):
     print("XAI grafikleri başarıyla kaydedildi.")
 
 if __name__ == "__main__":
-    file_path = "lstm_gru_data_interpolate.csv"
+    file_path = "bist100_data_interpolate.csv"
     if not os.path.exists(file_path):
         print(f"HATA: {file_path} bulunamadı.")
     else:

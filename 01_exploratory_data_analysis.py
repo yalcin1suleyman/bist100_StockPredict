@@ -77,40 +77,84 @@ def perform_eda(file_path):
     plt.close()
     
     # ---------------------------------------------------------
-    # 3. Şekil 5.3: Box Plots (Aykırı Değerler)
+    # 3. Şekil 5.3: Box Plots (Tüm Değişkenler - Şablon Stili)
     # ---------------------------------------------------------
-    print("Şekil 5.3 oluşturuluyor (Özelliklere ait Box Plot grafikleri)...")
+    print("Şekil 5.3 oluşturuluyor (Bütünleşik şablon Box Plot grafiği tüm özellikler için)...")
     
-    # Çok fazla özellik olduğu için en önemli/temel olanları seçip çizdirelim (Açılış, Kapanış, RSI, MACD, Volume vb.)
-    cols_to_plot = ['Open', 'High', 'Low', 'Close', 'Volume', 'RSI_14', 'MACD', 'ATR_14']
-    fig, axes = plt.subplots(2, 4, figsize=(16, 8))
+    # Tüm özellikleri (feature_cols) alıp hocanın estetik tarzıyla çizdirelim
+    # Renk paleti oluşturalım
+    import math
+    import itertools
+    
+    colors = ['#b3d1ff', '#b3ffcc', '#ffffb3', '#ffb3b3', '#d9b3ff', '#66c2cd', '#ffcc99', '#d1e0e0', '#ffcce6', '#b3ffb3', '#ffff66']
+    color_cycle = itertools.cycle(colors)
+    
+    # Izgara (Grid) boyutunu ayarlayalım
+    n_features = len(feature_cols)
+    n_cols = 7
+    n_rows = math.ceil(n_features / n_cols)
+    
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(22, 4 * n_rows))
     axes = axes.flatten()
     
-    for i, col in enumerate(cols_to_plot):
-        if col in df.columns:
-            sns.boxplot(y=df[col], ax=axes[i], color='lightblue')
-            axes[i].set_title(col)
-            axes[i].set_ylabel("")
+    for i in range(n_rows * n_cols):
+        ax = axes[i]
+        if i < n_features:
+            col = feature_cols[i]
+            data_to_plot = df[col].dropna()
             
-    plt.suptitle("Şekil 5.3. Özelliklere ait Box Plot grafikleri")
-    plt.tight_layout()
-    plt.savefig("Fig_5_3_Box_Plots.png", dpi=300)
+            # Hacim veya OBV gibi çok büyük değerli olanları milyon'a bölelim ki grafik düzgün görünsün
+            ylabel = "Değer"
+            if 'Volume' in col or 'OBV' in col:
+                data_to_plot = data_to_plot / 1e6
+                ylabel = "milyon"
+            elif col in ['Open', 'High', 'Low', 'Close', 'MA_10', 'MA_50', 'EMA_20', 'BB_Upper', 'BB_Lower', 'ATR_14', 'USD_TRY']:
+                ylabel = "Fiyat (TL)"
+                
+            box_color = next(color_cycle)
+                
+            sns.boxplot(y=data_to_plot, ax=ax, color=box_color, width=0.5,
+                        medianprops=dict(color="red", linewidth=1.5),
+                        flierprops=dict(marker='o', markerfacecolor='none', markeredgecolor='black', markersize=4, alpha=0.5))
+            
+            # Başlık (Mavi arka planlı kutu)
+            ax.set_title(col, fontsize=10, pad=10, fontweight='bold',
+                         bbox=dict(facecolor='#e6f2ff', edgecolor='none', boxstyle='round,pad=0.4'))
+            ax.set_ylabel(ylabel, fontsize=9)
+            ax.grid(axis='y', linestyle='--', alpha=0.5)
+            ax.set_xticks([])
+        else:
+            ax.axis('off') # Boş kalan kısımları gizle
+            
+    # Ana başlıklar
+    plt.suptitle(f"Özelliklere Ait Box Plot Grafikleri ({n_features} Değişken)\nBIST100 Veri Kümesi", fontsize=18, fontweight='bold', y=0.98)
+    
+    # Alt not
+    fig.text(0.5, 0.01, "Not: Kutular %25-%75 çeyrek aralığını, kırmızı çizgi medyanı, bıyıklar ise 1.5*IQR aralığını göstermektedir.\nDaireler aykırı değerleri (outliers) temsil etmektedir.", 
+             ha='center', fontsize=11, style='italic')
+             
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.savefig("Fig_5_3_Box_Plots_Template.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
-    # 4. Şekil 5.4: Pearson Korelasyon Matrisi
+    # 4. Şekil 5.4: Pearson Korelasyon Matrisi (Tüm Değişkenler)
     # ---------------------------------------------------------
-    print("Şekil 5.4 oluşturuluyor (Pearson Korelasyon Matrisi)...")
+    print("Şekil 5.4 oluşturuluyor (Pearson Korelasyon Matrisi - Tüm Özellikler)...")
     
-    # Korelasyon matrisi için sadece ilk 12 önemli değişkeni alalım ki görsel çok kalabalık olmasın
-    corr_cols = ['Open', 'High', 'Low', 'Close', 'Volume', 'RSI_14', 'MACD', 'EMA_20', 'ATR_14', 'BB_Width', 'Momentum_10', 'OBV']
-    corr_cols = [c for c in corr_cols if c in feature_cols]
+    # Veri setimizdeki TÜM özellikleri (feature_cols) dahil ediyoruz
+    corr_matrix = df[feature_cols].corr(method='pearson')
     
-    corr_matrix = df[corr_cols].corr(method='pearson')
+    # Tüm değişkenleri sığdırmak için devasa bir çözünürlük ve boyut ayarlıyoruz
+    plt.figure(figsize=(24, 20))
     
-    plt.figure(figsize=(12, 10))
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', vmin=-1, vmax=1, square=True)
-    plt.title("Pearson Korelasyon Matrisi (Şekil 5.4)")
+    # annot_kws ile yazı boyutunu küçültüyoruz ki sayılar birbirine girmesin
+    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', vmin=-1, vmax=1, 
+                square=True, annot_kws={"size": 7}, linewidths=.5)
+                
+    plt.title("Pearson Korelasyon Matrisi (Tüm Özellikler)", fontsize=20, fontweight='bold')
+    plt.xticks(rotation=45, ha='right', fontsize=10)
+    plt.yticks(fontsize=10)
     plt.tight_layout()
     plt.savefig("Fig_5_4_Pearson_Correlation.png", dpi=300)
     plt.close()
@@ -205,4 +249,4 @@ def perform_eda(file_path):
     print("--- EDA TAMAMLANDI! TÜM GRAFİKLER VE TABLOLAR OLUŞTURULDU ---")
 
 if __name__ == "__main__":
-    perform_eda("lstm_gru_data_interpolate.csv")
+    perform_eda("bist100_data_interpolate.csv")

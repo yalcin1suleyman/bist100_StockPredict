@@ -65,7 +65,7 @@ def train_and_evaluate_ml_models(file_path):
     # Hedef değişkende shift işlemi olduğu için indeksleri yeniden ayarlayarak split edeceğiz
     df['Target'] = df.groupby('Hisse_Kodu')['Close'].shift(-1)
     df = df.dropna(subset=['Target']).reset_index(drop=True)
-    _, test_df = preprocessor.time_series_split(df, shuffle=True)
+    _, test_df = preprocessor.time_series_split(df, shuffle=False)
     test_dates = pd.to_datetime(test_df[preprocessor.date_col]).values
     
     # 2. Modellerin Tanımlanması (CatBoost eklendi)
@@ -174,7 +174,7 @@ def train_and_evaluate_ml_models(file_path):
         plt.close()
 
 if __name__ == "__main__":
-    file_path = "lstm_gru_data_interpolate.csv"
+    file_path = "bist100_data_interpolate.csv"
     if not os.path.exists(file_path):
         print(f"HATA: {file_path} dosyası bulunamadı.")
     else:

@@ -123,8 +123,8 @@ class DataPreprocessor:
         df = df.dropna(subset=['Target']).reset_index(drop=True)
         self.target_col = 'Target' # Hedefi güncelledik
         
-        # Makine öğrenmesi modellerinin (Ağaçların) tüm veri aralığını görebilmesi için tezdeki gibi shuffle yapıyoruz
-        train_df, test_df = self.time_series_split(df, shuffle=True)
+        # Veri sızıntısını (Data Leakage) önlemek için veriyi KRONOLOJİK olarak bölüyoruz (shuffle=False)
+        train_df, test_df = self.time_series_split(df, shuffle=False)
         
         # Lineer Regresyonun hile yapmasını önlemek ve tezdeki skorlara (~%93) düşürmek için dünün saf fiyatlarını çıkarıyoruz.
         # Sadece hareketli ortalamalar (MA) ve teknik göstergeler bırakılıyor.
@@ -193,7 +193,7 @@ class DataPreprocessor:
 
 # Test için (eğer bu dosya doğrudan çalıştırılırsa)
 if __name__ == "__main__":
-    file_path = "lstm_gru_data_interpolate.csv"  # 29 Özellikli Veri Seti
+    file_path = "bist100_data_interpolate.csv"  # 29 Özellikli Veri Seti
     preprocessor = DataPreprocessor(file_path=file_path, target_col='Close', split_ratio=0.8, window_size=10)
     
     print("--- ML Verisi Test ---")

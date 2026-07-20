@@ -183,9 +183,14 @@ def calculate_technical_indicators(df):
         hisse_df['OBV'] = OnBalanceVolumeIndicator(close=hisse_df['Close'], volume=hisse_df['Volume']).on_balance_volume()
         
         # Stochastic Oscillator (momentum göstergesi)
+        # Stochastic Oscillator (momentum göstergesi)
         stoch = StochasticOscillator(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], window=14, smooth_window=3)
         hisse_df['Stoch_K'] = stoch.stoch()
         hisse_df['Stoch_D'] = stoch.stoch_signal()
+
+        # VWAP (Hacim Ağırlıklı Ortalama Fiyat)
+        from ta.volume import VolumeWeightedAveragePrice
+        hisse_df['VWAP'] = VolumeWeightedAveragePrice(high=hisse_df['High'], low=hisse_df['Low'], close=hisse_df['Close'], volume=hisse_df['Volume'], window=14).volume_weighted_average_price()
         
         dfs_to_concat.append(hisse_df)
         
@@ -198,7 +203,7 @@ def calculate_technical_indicators(df):
 # --- 4. Veri Bölme ve Dosya Kaydetme Fonksiyonu ---
 
 def generate_model_specific_files(df, suffix):
-    """Train/Test ayrımını yapar ve method'a özgü 3 adet dosyayı kaydeder."""
+    """Ana makine öğrenmesi ve derin öğrenme modelleri için tek bir temiz dosya kaydeder."""
     dfs_to_concat = []
     
     for hisse, group in df.groupby('Hisse_Kodu'):
@@ -216,16 +221,10 @@ def generate_model_specific_files(df, suffix):
     diger_kolonlar = [col for col in df_out.columns if col not in temel_kolonlar]
     df_out = df_out[temel_kolonlar + diger_kolonlar]
 
-    # 1. LSTM/GRU Formatı
-    df_out.to_csv(f"lstm_gru_data_{suffix}.csv", index=False, encoding='utf-8')
-    
-    # 2. ARIMA/Prophet Sade Formatı
-    arima_df = df_out[['Tarih', 'Hisse_Kodu', 'Close']]
-    arima_df.to_csv(f"arima_prophet_data_{suffix}.csv", index=False, encoding='utf-8')
-    
-    # 3. Prophet Özel Formatı (ds, y)
-    prophet_df = arima_df.rename(columns={'Tarih': 'ds', 'Close': 'y'})
-    prophet_df.to_csv(f"prophet_format_data_{suffix}.csv", index=False, encoding='utf-8')
+    # Tek ve temiz veri seti formatı (ARIMA/Prophet kalıntıları temizlendi)
+    dosya_adi = f"bist100_data_{suffix}.csv"
+    df_out.to_csv(dosya_adi, index=False, encoding='utf-8')
+    print(f" -> {dosya_adi} kaydedildi.")
 
 # --- 5. Ana Yürütme Bloğu ---
 
