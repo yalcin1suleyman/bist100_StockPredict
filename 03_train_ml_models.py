@@ -68,26 +68,57 @@ def train_and_evaluate_ml_models(file_path):
     _, test_df = preprocessor.time_series_split(df, shuffle=False)
     test_dates = pd.to_datetime(test_df[preprocessor.date_col]).values
     
-    # 2. Modellerin Tanımlanması (CatBoost eklendi)
-    models = {
-        'Linear Regression': LinearRegression(),
-        'SVR': SVR(kernel='rbf', C=1.0, gamma='scale'),
-        'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1),
-        'XGBoost': XGBRegressor(n_estimators=100, learning_rate=0.1, random_state=42, n_jobs=-1),
-        'LightGBM': LGBMRegressor(n_estimators=100, learning_rate=0.1, random_state=42, n_jobs=-1, verbose=-1),
-        'CatBoost': CatBoostRegressor(iterations=100, learning_rate=0.1, random_state=42, verbose=0)
+    # 2. Modellerin ve Hiperparametre Izgaralarının Tanımlanması (Grid)
+    models_and_params = {
+        'Linear Regression': {
+            'model': LinearRegression(),
+            'params': {}
+        },
+        'SVR': {
+            'model': SVR(),
+            'params': {'kernel': ['rbf', 'linear'], 'C': [0.1, 1, 10], 'gamma': ['scale', 'auto']}
+        },
+        'Random Forest': {
+            'model': RandomForestRegressor(random_state=42, n_jobs=-1),
+            'params': {'n_estimators': [50, 100, 200], 'max_depth': [None, 10, 20]}
+        },
+        'XGBoost': {
+            'model': XGBRegressor(random_state=42, n_jobs=-1),
+            'params': {'n_estimators': [50, 100, 200], 'learning_rate': [0.01, 0.1, 0.2], 'max_depth': [3, 5, 7]}
+        },
+        'LightGBM': {
+            'model': LGBMRegressor(random_state=42, n_jobs=-1, verbose=-1),
+            'params': {'n_estimators': [50, 100, 200], 'learning_rate': [0.01, 0.1, 0.2], 'num_leaves': [31, 50, 100]}
+        },
+        'CatBoost': {
+            'model': CatBoostRegressor(random_state=42, verbose=0),
+            'params': {'iterations': [50, 100, 200], 'learning_rate': [0.01, 0.1, 0.2], 'depth': [4, 6, 8]}
+        }
     }
     
     results = []
     predictions_dict = {}
     
-    # 3. Model Eğitimi
-    for name, model in models.items():
-        print(f"\n[{name}] modeli eğitiliyor...")
+    # 3. Model Eğitimi ve Optimizasyonu
+    from sklearn.model_selection import RandomizedSearchCV, TimeSeriesSplit
+    tscv = TimeSeriesSplit(n_splits=3)
+    
+    for name, mp in models_and_params.items():
+        print(f"\n[{name}] modeli optimize ediliyor ve eğitiliyor...")
         start_time = time.time()
         
-        model.fit(X_train, y_train)
-        y_pred_scaled = model.predict(X_test)
+        if not mp['params']:
+            best_model = mp['model']
+            best_model.fit(X_train, y_train)
+            print(f"[{name}] Parametre ızgarası boş, varsayılan parametrelerle eğitildi.")
+        else:
+            search = RandomizedSearchCV(mp['model'], mp['params'], n_iter=5, cv=tscv, 
+                                        scoring='neg_mean_squared_error', random_state=42, n_jobs=-1)
+            search.fit(X_train, y_train)
+            best_model = search.best_estimator_
+            print(f"[{name}] En iyi parametreler: {search.best_params_}")
+            
+        y_pred_scaled = best_model.predict(X_test)
         
         if len(y_pred_scaled.shape) == 1:
             y_pred_scaled = y_pred_scaled.reshape(-1, 1)

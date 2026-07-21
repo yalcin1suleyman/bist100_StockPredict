@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import shap
+import lime
+import lime.lime_tabular
 import os
 
 # Uyarıları gizle
@@ -52,6 +54,48 @@ def run_shap_analysis(file_path):
     plt.savefig("Fig_5_25_SHAP_Summary_Plot.png", dpi=300)
     plt.close()
     
+    # 3. Şekil 5.26: Yerel (Local) SHAP Analizi (Waterfall Plot) - Tek bir gün (Örn: İlk test günü)
+    print("\nYerel (Local) SHAP ve LIME analizleri oluşturuluyor...")
+    instance_idx = 0  # Test setindeki ilk günü inceleyelim
+    
+    plt.figure()
+    # TreeExplainer for LightGBM returns raw values. We need an Explanation object for waterfall
+    # Expected value is a scalar or an array depending on the model, we ensure it's scalar here
+    expected_val = explainer.expected_value[0] if isinstance(explainer.expected_value, (list, np.ndarray)) else explainer.expected_value
+    shap_exp = shap.Explanation(values=shap_values[instance_idx], 
+                                base_values=expected_val, 
+                                data=X_test[instance_idx], 
+                                feature_names=feature_names)
+    shap.waterfall_plot(shap_exp, show=False)
+    plt.title(f"Şekil 5.26. SHAP Waterfall Plot (Yerel Açıklama)")
+    plt.tight_layout()
+    plt.savefig("Fig_5_26_SHAP_Waterfall_Plot.png", dpi=300)
+    plt.close()
+
+    # 4. Şekil 5.27: Yerel (Local) LIME Analizi
+    lime_explainer = lime.lime_tabular.LimeTabularExplainer(
+        training_data=X_train,
+        feature_names=feature_names,
+        class_names=['Kapanis_Fiyati'],
+        mode='regression',
+        random_state=42
+    )
+    
+    exp = lime_explainer.explain_instance(
+        data_row=X_test[instance_idx], 
+        predict_fn=lgbm_model.predict
+    )
+    
+    # LIME sonucunu HTML olarak kaydet
+    exp.save_to_file('Fig_5_27_LIME_Local_Explanation.html')
+    
+    # Ayrıca LIME grafiğini PNG olarak da kaydedelim (pyplot figürü olarak döner)
+    fig = exp.as_pyplot_figure()
+    plt.title(f"Şekil 5.27. LIME Yerel Açıklaması")
+    plt.tight_layout()
+    fig.savefig("Fig_5_27_LIME_Local_Explanation.png", dpi=300)
+    plt.close(fig)
+
     print("XAI grafikleri başarıyla kaydedildi.")
 
 if __name__ == "__main__":
