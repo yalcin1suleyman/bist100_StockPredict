@@ -232,6 +232,10 @@ if __name__ == "__main__":
     df_stocks, df_macro = fetch_raw_data()
     raw_df = align_and_prepare_raw_df(df_stocks, df_macro)
     
+    # Ham veriyi (imputation ve indikatör öncesi saf hali) diske kaydet
+    raw_df.to_csv("bist100_ham_veri.csv", index=False, encoding='utf-8')
+    print(" -> bist100_ham_veri.csv (Ham Veri) kaydedildi.")
+    
     # Versiyon A: FFill
     df_ffill = apply_ffill(raw_df)
     df_ffill_ind = calculate_technical_indicators(df_ffill)
