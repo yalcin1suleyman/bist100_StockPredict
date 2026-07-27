@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import skew, kurtosis
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
 
 # Uyarıları gizle
 import warnings
@@ -51,7 +52,7 @@ def perform_eda(file_path):
             'Basıklık (Kurtosis)': kurtosis(col_data)
         })
     stats_df = pd.DataFrame(stats_list)
-    stats_df.to_csv("Table_5_1_Descriptive_Statistics.csv", index=False)
+    stats_df.to_csv("outputs/Table_5_1_Descriptive_Statistics.csv", index=False)
     
     # ---------------------------------------------------------
     # 2. Şekil 5.1 & 5.2: Fiyat ve Hacim Çizimleri
@@ -64,7 +65,7 @@ def perform_eda(file_path):
     plt.xlabel("Tarih")
     plt.ylabel("Kapanış Fiyatı (TL)")
     plt.tight_layout()
-    plt.savefig("Fig_5_1_Closing_Prices.png", dpi=300)
+    plt.savefig("outputs/Fig_5_1_Closing_Prices.png", dpi=300)
     plt.close()
     
     plt.figure(figsize=(12, 6))
@@ -73,70 +74,115 @@ def perform_eda(file_path):
     plt.xlabel("Tarih")
     plt.ylabel("İşlem Hacmi")
     plt.tight_layout()
-    plt.savefig("Fig_5_2_Volume.png", dpi=300)
+    plt.savefig("outputs/Fig_5_2_Volume.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
-    # 3. Şekil 5.3: Box Plots (Tüm Değişkenler - Şablon Stili)
+    # 3. Şekil 5.3: Box Plots (3 Mantıksal Grup)
     # ---------------------------------------------------------
-    print("Şekil 5.3 oluşturuluyor (Bütünleşik şablon Box Plot grafiği tüm özellikler için)...")
+    print("Şekil 5.3 oluşturuluyor (3 ayrı mantıksal gruba bölünmüş Box Plot grafikleri)...")
     
-    # Tüm özellikleri (feature_cols) alıp hocanın estetik tarzıyla çizdirelim
-    # Renk paleti oluşturalım
     import math
     import itertools
     
     colors = ['#b3d1ff', '#b3ffcc', '#ffffb3', '#ffb3b3', '#d9b3ff', '#66c2cd', '#ffcc99', '#d1e0e0', '#ffcce6', '#b3ffb3', '#ffff66']
-    color_cycle = itertools.cycle(colors)
     
-    # Izgara (Grid) boyutunu ayarlayalım
-    n_features = len(feature_cols)
-    n_cols = 7
-    n_rows = math.ceil(n_features / n_cols)
+    # 1. GRUP: Temel Veriler ve Makroekonomi (8 Özellik - 2x4 Grid)
+    grid1_features = {
+        'Open': 'Açılış (Open)', 'High': 'En Yüksek (High)', 'Low': 'En Düşük (Low)', 'Close': 'Kapanış (Close)', 
+        'Volume': 'İşlem Hacmi\n(Volume, milyon lot)', 'Gunluk_Getiri': 'Günlük Getiri', 'USD_TRY': 'USD/TRY', 'VIX': 'VIX'
+    }
     
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(22, 4 * n_rows))
-    axes = axes.flatten()
+    # 2. GRUP: Trend, Hacim ve Volatilite Göstergeleri (10 Özellik - 2x5 Grid)
+    grid2_features = {
+        'MA_10': 'SMA (10)', 'MA_50': 'SMA (50)', 'EMA_20': 'EMA (20)', 'VWAP': 'VWAP', 'OBV': 'OBV',
+        'Volatilite_10': 'Volatilite (10)', 'ATR_14': 'ATR (14)', 'BB_Upper': 'BB Üst', 'BB_Lower': 'BB Alt', 'BB_Width': 'BB Genişlik'
+    }
     
-    for i in range(n_rows * n_cols):
-        ax = axes[i]
-        if i < n_features:
-            col = feature_cols[i]
-            data_to_plot = df[col].dropna()
-            
-            # Hacim veya OBV gibi çok büyük değerli olanları milyon'a bölelim ki grafik düzgün görünsün
-            ylabel = "Değer"
-            if 'Volume' in col or 'OBV' in col:
-                data_to_plot = data_to_plot / 1e6
-                ylabel = "milyon"
-            elif col in ['Open', 'High', 'Low', 'Close', 'MA_10', 'MA_50', 'EMA_20', 'BB_Upper', 'BB_Lower', 'ATR_14', 'USD_TRY']:
-                ylabel = "Fiyat (TL)"
-                
-            box_color = next(color_cycle)
-                
-            sns.boxplot(y=data_to_plot, ax=ax, color=box_color, width=0.5,
-                        medianprops=dict(color="red", linewidth=1.5),
-                        flierprops=dict(marker='o', markerfacecolor='none', markeredgecolor='black', markersize=4, alpha=0.5))
-            
-            # Başlık (Mavi arka planlı kutu)
-            ax.set_title(col, fontsize=10, pad=10, fontweight='bold',
-                         bbox=dict(facecolor='#e6f2ff', edgecolor='none', boxstyle='round,pad=0.4'))
-            ax.set_ylabel(ylabel, fontsize=9)
-            ax.grid(axis='y', linestyle='--', alpha=0.5)
-            ax.set_xticks([])
-        else:
-            ax.axis('off') # Boş kalan kısımları gizle
-            
-    # Ana başlıklar
-    plt.suptitle(f"Özelliklere Ait Box Plot Grafikleri ({n_features} Değişken)\nBIST100 Veri Kümesi", fontsize=18, fontweight='bold', y=0.98)
+    # 3. GRUP: Momentum ve Osilatörler (10 Özellik - 2x5 Grid)
+    grid3_features = {
+        'RSI_14': 'RSI (14)', 'MACD': 'MACD', 'MACD_Signal': 'MACD Sinyal', 'MACD_Histogram': 'MACD Histogram', 
+        'Momentum_10': 'Momentum (10)', 'Williams_R': 'Williams %R', 'Stoch_K': 'Stoch K', 'Stoch_D': 'Stoch D', 
+        'CCI_20': 'CCI (20)', 'ADX_14': 'ADX (14)'
+    }
     
-    # Alt not
-    fig.text(0.5, 0.01, "Not: Kutular %25-%75 çeyrek aralığını, kırmızı çizgi medyanı, bıyıklar ise 1.5*IQR aralığını göstermektedir.\nDaireler aykırı değerleri (outliers) temsil etmektedir.", 
-             ha='center', fontsize=11, style='italic')
+    grids = [
+        ("outputs/Fig_5_3_Box_Plots_1_Temel_Veriler.png", grid1_features, "Temel Finansal ve Makroekonomik Veriler", 2, 4, 12),
+        ("outputs/Fig_5_3_Box_Plots_2_Trend_Volatilite.png", grid2_features, "Trend, Hacim ve Volatilite Göstergeleri", 2, 5, 15),
+        ("outputs/Fig_5_3_Box_Plots_3_Momentum.png", grid3_features, "Momentum ve Osilatör Göstergeleri", 2, 5, 15)
+    ]
              
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig("Fig_5_3_Box_Plots_Template.png", dpi=300)
-    plt.close()
+    for file_name, features_dict, sub_title, n_rows, n_cols, width in grids:
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(width, 8))
+        axes = axes.flatten()
+        color_cycle = itertools.cycle(colors)
+        
+        for i, (col, title) in enumerate(features_dict.items()):
+            ax = axes[i]
+            if col in df.columns:
+                data_to_plot = df[col].dropna()
+                
+                ylabel = "Değer"
+                if 'Volume' in col or 'OBV' in col:
+                    data_to_plot = data_to_plot / 1e6
+                    ylabel = "milyon"
+                    if 'Volume' in col: ylabel = "milyon lot"
+                elif col in ['Open', 'High', 'Low', 'Close', 'MA_10', 'MA_50', 'EMA_20', 'BB_Upper', 'BB_Lower', 'ATR_14', 'USD_TRY', 'VWAP']:
+                    ylabel = "Fiyat (TL)"
+                    
+                box_color = next(color_cycle)
+                
+                sns.boxplot(y=data_to_plot, ax=ax, color=box_color, width=0.5,
+                            medianprops=dict(color="red", linewidth=1.5),
+                            flierprops=dict(marker='o', markerfacecolor='none', markeredgecolor='black', markersize=4, alpha=0.5))
+                
+                ax.set_title(title, fontsize=13, pad=10, fontweight='bold',
+                             bbox=dict(facecolor='#e6f2ff', edgecolor='#d9d9d9', boxstyle='round,pad=0.4'))
+                ax.set_ylabel(ylabel, fontsize=12)
+                ax.tick_params(axis='y', labelsize=11)
+                ax.grid(axis='y', linestyle='--', alpha=0.5)
+                ax.set_xticks([])
+            else:
+                ax.axis('off')
+                
+        # Fill empty subplots if any (e.g. if we had 9 features in a 2x5 grid)
+        for j in range(i + 1, n_rows * n_cols):
+            axes[j].axis('off')
+                
+        plt.suptitle(f"{sub_title}\nBIST100 Veri Kümesi (01.01.2015 – 31.12.2024)", fontsize=18, fontweight='bold', y=0.98)
+        fig.text(0.5, 0.02, "Not: Kutular %25-%75 çeyrek aralığını, kırmızı çizgi medyanı, bıyıklar ise 1.5*IQR aralığını göstermektedir.", 
+                 ha='center', fontsize=14, style='italic', fontweight='bold')
+                 
+        plt.tight_layout(rect=[0, 0.05, 1, 0.93])
+        plt.savefig(file_name, dpi=300)
+        plt.close()
     
+    # ---------------------------------------------------------
+    # 3.1 Şekil 5.3 (Ekstra): Tüm Özellikler İçin Tek Bir Box Plot (Z-Score)
+    # ---------------------------------------------------------
+    print("Tüm özellikler için tek bir standartlaştırılmış Box Plot oluşturuluyor (Z-Score)...")
+    
+    # Sadece sayısal özellikleri al
+    X_num = df[feature_cols].dropna()
+    
+    # Standartlaştırma uygula
+    scaler = StandardScaler()
+    X_scaled = pd.DataFrame(scaler.fit_transform(X_num), columns=X_num.columns)
+    
+    plt.figure(figsize=(22, 10))
+    sns.boxplot(data=X_scaled, palette='Set3', linewidth=1.2, fliersize=3)
+    
+    plt.title("Tüm Özelliklerin Karşılaştırmalı Kutu Grafiği (Standartlaştırılmış - Z Score)", fontsize=18, fontweight='bold', pad=15)
+    plt.xlabel("BIST 100 Özellikleri (Makroekonomik, Teknik ve Ham Fiyat)", fontsize=14, labelpad=10)
+    plt.ylabel("Standart Sapma Birimi (Z-Score)", fontsize=14)
+    plt.xticks(rotation=45, ha='right', fontsize=11)
+    plt.yticks(fontsize=11)
+    
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig("outputs/Fig_5_3_Box_Plots_Tum_Ozellikler_ZScore.png", dpi=300, bbox_inches='tight')
+    plt.close()
+
     # ---------------------------------------------------------
     # 4. Şekil 5.4: Pearson Korelasyon Matrisi (Tüm Değişkenler)
     # ---------------------------------------------------------
@@ -156,7 +202,7 @@ def perform_eda(file_path):
     plt.xticks(rotation=45, ha='right', fontsize=10)
     plt.yticks(fontsize=10)
     plt.tight_layout()
-    plt.savefig("Fig_5_4_Pearson_Correlation.png", dpi=300)
+    plt.savefig("outputs/Fig_5_4_Pearson_Correlation.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
@@ -175,7 +221,7 @@ def perform_eda(file_path):
         
     plt.suptitle("Şekil 5.5. Özellik Dağılımları")
     plt.tight_layout()
-    plt.savefig("Fig_5_5_Feature_Distributions.png", dpi=300)
+    plt.savefig("outputs/Fig_5_5_Feature_Distributions.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
@@ -211,7 +257,7 @@ def perform_eda(file_path):
     
     plt.suptitle("Şekil 5.6. Hareketli ortalama ve volatilite grafiği")
     plt.tight_layout()
-    plt.savefig("Fig_5_6_Moving_Average_Volatility.png", dpi=300)
+    plt.savefig("outputs/Fig_5_6_Moving_Average_Volatility.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
@@ -243,10 +289,10 @@ def perform_eda(file_path):
     plt.xlabel('Özellik Önemi (Mean Decrease in Impurity)')
     plt.title('Şekil 5.7. Ön özellik önem grafiği (Random Forest)')
     plt.tight_layout()
-    plt.savefig("Fig_5_7_RF_Feature_Importance.png", dpi=300)
+    plt.savefig("outputs/Fig_5_7_RF_Feature_Importance.png", dpi=300)
     plt.close()
     
     print("--- EDA TAMAMLANDI! TÜM GRAFİKLER VE TABLOLAR OLUŞTURULDU ---")
 
 if __name__ == "__main__":
-    perform_eda("bist100_data_interpolate.csv")
+    perform_eda("data/bist100_data_interpolate.csv")

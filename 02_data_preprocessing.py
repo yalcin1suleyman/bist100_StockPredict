@@ -113,7 +113,7 @@ class DataPreprocessor:
             
         return np.array(X_window), np.array(y_window)
 
-    def get_ml_data(self, scaler_type='minmax'):
+    def get_ml_data(self, scaler_type='minmax', feature_set='all'):
         """Geleneksel Makine Öğrenmesi (ML) modelleri için hazır 2B veri döndürür."""
         df = self.load_and_clean_data()
         
@@ -130,6 +130,18 @@ class DataPreprocessor:
         # Sadece hareketli ortalamalar (MA) ve teknik göstergeler bırakılıyor.
         price_cols_to_drop = ['Close', 'Open', 'High', 'Low']
         self.feature_cols = [c for c in self.feature_cols if c not in price_cols_to_drop]
+        
+        # HOCANIN İSTERİ: Özellik Seti (Feature Ablation) Filtreleme
+        raw_cols = ['Volume', 'USD_TRY', 'VIX', 'Gunluk_Getiri']
+        
+        if feature_set == 'raw':
+            self.feature_cols = [c for c in self.feature_cols if c in raw_cols]
+            print(f"[{self.__class__.__name__}] Sadece Ham Özellikler (Raw) seçildi: {self.feature_cols}")
+        elif feature_set == 'technical':
+            self.feature_cols = [c for c in self.feature_cols if c not in raw_cols]
+            print(f"[{self.__class__.__name__}] Sadece Teknik Özellikler (Technical) seçildi.")
+        else:
+            print(f"[{self.__class__.__name__}] Tüm Özellikler (All) seçildi.")
         
         X_train, y_train, X_test, y_test = self.normalize_data(train_df, test_df, scaler_type)
         
@@ -157,19 +169,18 @@ class DataPreprocessor:
         # Bunun için normalizasyon sonuçlarını df'e geri koyalım veya grup indislerini kullanalım
         # En temizi: train ve test dataframe'lerini kullanarak gruplamak.
         for hisse in df['Hisse_Kodu'].unique():
-            # İlgili hisseye ait satırların indeksleri
-            train_idx = train_df[train_df['Hisse_Kodu'] == hisse].index
-            test_idx = test_df[test_df['Hisse_Kodu'] == hisse].index
+            train_mask = (train_df['Hisse_Kodu'] == hisse).values
+            test_mask = (test_df['Hisse_Kodu'] == hisse).values
             
             # Eğer window_size'dan küçük veri varsa atla
-            if len(train_idx) <= self.window_size or len(test_idx) <= self.window_size:
+            if train_mask.sum() <= self.window_size or test_mask.sum() <= self.window_size:
                 continue
                 
-            X_train_hisse = X_train_full[train_idx]
-            y_train_hisse = y_train_full[train_idx]
+            X_train_hisse = X_train_full[train_mask]
+            y_train_hisse = y_train_full[train_mask]
             
-            X_test_hisse = X_test_full[test_idx]
-            y_test_hisse = y_test_full[test_idx]
+            X_test_hisse = X_test_full[test_mask]
+            y_test_hisse = y_test_full[test_mask]
             
             # Sliding window oluştur
             # X(t, t+1.. t+w-1) -> y(t+w)
@@ -181,7 +192,7 @@ class DataPreprocessor:
             X_test_dl_list.append(X_te)
             y_test_dl_list.append(y_te)
             
-            y_test_unscaled_list.append(test_df.loc[test_idx, [self.target_col]].values[self.window_size:].ravel())
+            y_test_unscaled_list.append(test_df[test_mask][[self.target_col]].values[self.window_size:].ravel())
             
         X_train_dl = np.vstack(X_train_dl_list)
         y_train_dl = np.vstack(y_train_dl_list)
@@ -193,7 +204,7 @@ class DataPreprocessor:
 
 # Test için (eğer bu dosya doğrudan çalıştırılırsa)
 if __name__ == "__main__":
-    file_path = "bist100_data_interpolate.csv"  # 29 Özellikli Veri Seti
+    file_path = "data/bist100_data_interpolate.csv"  # 29 Özellikli Veri Seti
     preprocessor = DataPreprocessor(file_path=file_path, target_col='Close', split_ratio=0.8, window_size=10)
     
     print("--- ML Verisi Test ---")

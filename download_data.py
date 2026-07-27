@@ -222,7 +222,7 @@ def generate_model_specific_files(df, suffix):
     df_out = df_out[temel_kolonlar + diger_kolonlar]
 
     # Tek ve temiz veri seti formatı (ARIMA/Prophet kalıntıları temizlendi)
-    dosya_adi = f"bist100_data_{suffix}.csv"
+    dosya_adi = f"data/bist100_data_{suffix}.csv"
     df_out.to_csv(dosya_adi, index=False, encoding='utf-8')
     print(f" -> {dosya_adi} kaydedildi.")
 
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     raw_df = align_and_prepare_raw_df(df_stocks, df_macro)
     
     # Ham veriyi (imputation ve indikatör öncesi saf hali) diske kaydet
-    raw_df.to_csv("bist100_ham_veri.csv", index=False, encoding='utf-8')
+    raw_df.to_csv("data/bist100_ham_veri.csv", index=False, encoding='utf-8')
     print(" -> bist100_ham_veri.csv (Ham Veri) kaydedildi.")
     
     # Versiyon A: FFill
@@ -281,4 +281,4 @@ if __name__ == "__main__":
     
     print(f"1. FFill vs. Linear Interpolation : {diff_ffill_interp} farklı hücre. (Farklı olanların Ortalama Mutlak Farkı: {mad_ffill_interp:.4f})")
     print(f"2. FFill vs. KNN Imputer          : {diff_ffill_knn} farklı hücre. (Farklı olanların Ortalama Mutlak Farkı: {mad_ffill_knn:.4f})")
-    print("\nBu farklılık metrikleri makalede 'eksik veri stratejisinin modele etkisi' başlığı altında ampirik veri olarak kullanılabilir.")
+    print("\nBu farklılık metrikleri 'eksik veri stratejisinin modele etkisi' başlığı altında ampirik veri olarak kullanılabilir.")
