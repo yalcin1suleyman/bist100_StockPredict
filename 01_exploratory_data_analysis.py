@@ -206,28 +206,42 @@ def perform_eda(file_path):
     plt.close()
     
     # ---------------------------------------------------------
-    # 5. Şekil 5.5: Özellik Dağılımları (Histogram ve KDE)
+    # 5. Şekil 5.6: Özellik Dağılımları (Histogram ve KDE) - 3 Grup
     # ---------------------------------------------------------
-    print("Şekil 5.5 oluşturuluyor (Özellik Dağılımları)...")
+    print("Şekil 5.6 oluşturuluyor (Özellik Dağılımları - Tüm Özellikler 3 Grup Halinde)...")
     
-    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
-    axes = axes.flatten()
-    dist_cols = ['Close', 'Volume', 'Gunluk_Getiri', 'RSI_14', 'MACD', 'Momentum_10', 'ATR_14', 'Williams_R', 'CCI_20']
-    dist_cols = [c for c in dist_cols if c in feature_cols]
+    chunk_size = int(np.ceil(len(feature_cols) / 3))
     
-    for i, col in enumerate(dist_cols[:9]):
-        sns.histplot(df[col].dropna(), kde=True, ax=axes[i], bins=30, color='steelblue')
-        axes[i].set_title(col)
+    for chunk_idx in range(3):
+        start_idx = chunk_idx * chunk_size
+        end_idx = min((chunk_idx + 1) * chunk_size, len(feature_cols))
+        cols_to_plot = feature_cols[start_idx:end_idx]
         
-    plt.suptitle("Şekil 5.5. Özellik Dağılımları")
-    plt.tight_layout()
-    plt.savefig("outputs/Fig_5_5_Feature_Distributions.png", dpi=300)
-    plt.close()
+        if not cols_to_plot:
+            continue
+            
+        n_cols_plot = len(cols_to_plot)
+        n_rows_fig = int(np.ceil(n_cols_plot / 3))
+        fig, axes = plt.subplots(n_rows_fig, 3, figsize=(15, 4 * n_rows_fig))
+        axes = axes.flatten()
+        
+        for i, col in enumerate(cols_to_plot):
+            sns.histplot(df[col].dropna(), kde=True, ax=axes[i], bins=30, color='steelblue')
+            axes[i].set_title(col)
+            
+        # Hide any unused subplots
+        for i in range(n_cols_plot, len(axes)):
+            axes[i].axis('off')
+            
+        plt.suptitle(f"Şekil 5.6.{chunk_idx+1}. Özellik Dağılımları (Bölüm {chunk_idx+1})", y=1.02)
+        plt.tight_layout()
+        plt.savefig(f"outputs/Fig_5_6_Ozellik_Dagilimlari_{chunk_idx+1}.png", dpi=300, bbox_inches='tight')
+        plt.close()
     
     # ---------------------------------------------------------
-    # 6. Şekil 5.6: Hareketli Ortalama ve Volatilite Grafiği
+    # 6. Şekil 5.7: Hareketli Ortalama ve Volatilite Grafiği
     # ---------------------------------------------------------
-    print("Şekil 5.6 oluşturuluyor (Hareketli Ortalama ve Volatilite)...")
+    print("Şekil 5.7 oluşturuluyor (Hareketli Ortalama ve Volatilite)...")
     
     # Tek bir hisse (veya endeks) üzerinden göstermek daha mantıklı, örneğin verideki ilk hisse
     hisse = df['Hisse_Kodu'].iloc[0]
@@ -255,41 +269,78 @@ def perform_eda(file_path):
     ax2.legend()
     ax2.grid(True, alpha=0.3)
     
-    plt.suptitle("Şekil 5.6. Hareketli ortalama ve volatilite grafiği")
+    plt.suptitle("Şekil 5.7. Hareketli ortalama ve volatilite grafiği")
     plt.tight_layout()
-    plt.savefig("outputs/Fig_5_6_Moving_Average_Volatility.png", dpi=300)
+    plt.savefig("outputs/Fig_5_7_Moving_Average_Volatility.png", dpi=300)
     plt.close()
     
     # ---------------------------------------------------------
-    # 7. Şekil 5.7: Özellik Öneminin Ön Analizi (Random Forest)
+    # 7. Şekil 5.8: Özellik Öneminin Ön Analizi (Random Forest)
     # ---------------------------------------------------------
-    print("Şekil 5.7 oluşturuluyor (RF Özellik Önemi)...")
+    print("Şekil 5.8 oluşturuluyor (RF Özellik Önemi)...")
     
-    # Hedef olarak 'Close' alalım (veri sızıntısı olmaması için Close'u t+1 yapacağız veya diğerlerini kullanacağız)
-    # Taslaktaki amaç sadece "hangi değişkenler kapanışı belirliyor" sorusudur.
-    X = df[feature_cols].copy()
-    # Eğer X içinde Close varsa çıkaralım
-    features_for_rf = [c for c in feature_cols if c != 'Close']
-    X = df[features_for_rf]
-    y = df['Close']
+    # Hedef: Yarının yüzdesel getirisi (fiyat değişim oranı).
+    # Ham fiyatı tahmin etmek yerine getiriyi tahmin edersek, fiyat seviyesini taşıyan
+    # değişkenler (Close, High, Low) dominant olmaz ve teknik göstergelerin
+    # gerçek katkısı ortaya çıkar (örnek grafikteki gibi dengeli dağılım).
+    df_rf = df.copy()
+    df_rf['Next_Return'] = df_rf.groupby('Hisse_Kodu')['Close'].pct_change().shift(-1)
+    df_rf = df_rf.dropna(subset=['Next_Return'])
     
-    rf = RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1)
-    rf.fit(X.fillna(0), y) # Basitçe fillna(0) dedik çünkü bu sadece keşifsel bir adım
+    # Tüm özellikleri kullan (Close, Open, High, Low dahil)
+    features_for_rf = [c for c in feature_cols]
+    
+    X = df_rf[features_for_rf].fillna(0)
+    y = df_rf['Next_Return']
+    
+    rf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    rf.fit(X, y)
     
     importances = rf.feature_importances_
     indices = np.argsort(importances)
     
-    # Sadece en önemli 15 özelliği çizdirelim
-    top_n = 15
-    top_indices = indices[-top_n:]
+    # Türkçe etiketler
+    turkish_labels = {
+        'Close': 'Kapanış Fiyatı (Close)', 'Open': 'Açılış Fiyatı (Open)',
+        'High': 'En Yüksek Fiyat (High)', 'Low': 'En Düşük Fiyat (Low)',
+        'Volume': 'İşlem Hacmi (Volume)', 'Gunluk_Getiri': 'Günlük Getiri (%)',
+        'MA_10': 'SMA (10)', 'MA_50': 'SMA (50)', 'EMA_20': 'EMA (20)',
+        'RSI_14': 'RSI (14)', 'MACD': 'MACD', 'MACD_Signal': 'MACD Sinyal',
+        'MACD_Histogram': 'MACD Histogram', 'BB_Upper': 'Bollinger Üst Bandı',
+        'BB_Lower': 'Bollinger Alt Bandı', 'BB_Width': 'Bollinger Bant Genişliği',
+        'ATR_14': 'ATR (14)', 'OBV': 'OBV', 'VWAP': 'VWAP',
+        'Momentum_10': 'Momentum (10)', 'ROC_10': 'ROC (%)',
+        'Stoch_K': 'Stochastic %K', 'Stoch_D': 'Stochastic %D',
+        'Williams_R': 'Williams %R', 'CCI_20': 'CCI (20)',
+        'ADX_14': 'ADX (14)', 'Volatilite_10': 'Volatilite (10)',
+        'USD_TRY': 'USD/TRY', 'VIX': 'VIX'
+    }
     
-    plt.figure(figsize=(10, 8))
-    plt.barh(range(top_n), importances[top_indices], color='mediumseagreen', align='center')
-    plt.yticks(range(top_n), [features_for_rf[i] for i in top_indices])
-    plt.xlabel('Özellik Önemi (Mean Decrease in Impurity)')
-    plt.title('Şekil 5.7. Ön özellik önem grafiği (Random Forest)')
-    plt.tight_layout()
-    plt.savefig("outputs/Fig_5_7_RF_Feature_Importance.png", dpi=300)
+    n_features = len(features_for_rf)
+    
+    # Renkli barlar (örnek grafikteki gibi her bar farklı renk)
+    colors = plt.cm.tab20(np.linspace(0, 1, n_features))
+    
+    fig, ax = plt.subplots(figsize=(12, 10))
+    
+    for rank, idx in enumerate(indices):
+        label = turkish_labels.get(features_for_rf[idx], features_for_rf[idx])
+        bar = ax.barh(rank, importances[idx], color=colors[rank % len(colors)], align='center', height=0.7)
+        ax.text(importances[idx] + 0.002, rank, f'{importances[idx]:.3f}', va='center', fontsize=9)
+    
+    labels = [turkish_labels.get(features_for_rf[i], features_for_rf[i]) for i in indices]
+    ax.set_yticks(range(n_features))
+    ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlabel('Özellik Önemi (Mean Decrease in Impurity)')
+    ax.set_title('Ön Özellik Önem Grafiği\nRandom Forest Modeli ile Tahmin Performansı Ön Değerlendirmesi\nBIST100 Veri Kümesi (01.01.2021 – 31.12.2023)', fontsize=11, fontweight='bold')
+    
+    fig.text(0.5, 0.01, 
+             'Not: Değerler Random Forest modelinin Mean Decrease in Impurity (MDI) yöntemine göre hesaplanmıştır.\n'
+             'Değerlerin büyüklüğü, ilgili özelliğin tahmin performansına katkısının göreli ölçüsünü gösterir.',
+             ha='center', fontsize=8, style='italic', color='gray')
+    
+    plt.tight_layout(rect=[0, 0.05, 1, 1])
+    plt.savefig("outputs/Fig_5_8_RF_Feature_Importance.png", dpi=300, bbox_inches='tight')
     plt.close()
     
     print("--- EDA TAMAMLANDI! TÜM GRAFİKLER VE TABLOLAR OLUŞTURULDU ---")

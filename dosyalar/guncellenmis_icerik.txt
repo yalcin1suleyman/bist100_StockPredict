@@ -1,0 +1,458 @@
+[0] BIST100 HİSSE SENEDİ FİYAT TAHMİNİ İÇİN AÇIKLANABİLİR MAKİNE ÖĞRENMESİ VE DERİN ÖĞRENME MODELLERİNİN KARŞILAŞTIRMALI PERFORMANS VE YORUMLANABİLİRLİK ANALİZİ
+[1] 
+[2] ÖZET
+[3] !!! Burada çalışma hakkında genel bilgi verip; problem tanımı, literatürdeki eksiklik, çalışmanın amacı, kullanılan veri seti, makine öğrenmesi modelleri, derin öğrenme modelleri, açıklanabilir yapay zekâ analizleri, başlıca bulgular ve katkılar hakkında birer cümleyle bilgi verelim.
+[4] 
+[5] 1. GİRİŞ
+[6] 1.1 Finansal Zaman Serilerinde Tahmin Problemi
+[7] !!! Aşağıdaki konuları referans vererek anlatalım.
+[8] Finansal piyasaların dinamik yapısı 
+[9] BIST100'ün ekonomik önemi 
+[10] Tahminin yatırım kararlarına etkisi 
+[11] 1.2 Makine Öğrenmesi ve Derin Öğrenmenin Kullanımı 
+[12] !!! Burada hisse senedi tahmininde kullanılan yöntemler ve modelleri aşağıdaki başlıklar halinde açıklayalım. 
+[13] Geleneksel istatistiksel yöntemler 
+[14] Makine öğrenmesi 
+[15] Derin öğrenme 
+[16] Transformer tabanlı modeller
+[17] 1.3 Kara Kutu Problemi
+[18] !!! Bu bölümde aşağıdaki başlıkları açıklayıp açıklanabilirlik neden önemli onu sunalım.  
+[19] Neden yatırımcılar modele güvenmiyor? 
+[20] Finans sektöründe açıklanabilirlik neden önemli?
+[21] 1.4 Çalışmanın Katkıları
+[22] !!! Bu bölümde makalenin katkıları açıklanmalıdır. Aşağıdakiler olabilir.
+[23] ??? farklı model karşılaştırılmıştır. 
+[24] SHAP ve LIME analizleri uygulanmıştır. 
+[25] Teknik göstergelerin etkisi incelenmiştir. 
+[26] Global ve yerel açıklamalar oluşturulmuştur. 
+[27] Model güvenilirliği analiz edilmiştir. 
+[28] İstatistiksel anlamlılık testleri gerçekleştirilmiştir.
+[29] 
+[30] 2. İLGİLİ ÇALIŞMALAR
+[31] Bu bölümde, BIST100 hisse senedi piyasasının tahminine yönelik literatürde yer alan makine öğrenmesi ve derin öğrenme çalışmaları incelenmiştir. Hisse senedi piyasası tahmini, yüksek oynaklık ve doğrusal olmayan dinamikler içerdiğinden geleneksel ekonometrik yöntemlerin yetersiz kalabildiği bir alandır. Bu nedenle literatürde derin öğrenme ve makine öğrenmesi tekniklerinin kullanımı giderek yaygınlaşmaktadır
+[32] 
+[33] 2.1 BIST100 Tahmin Çalışmaları
+[34] Literatürde BIST100 endeksinin fiyatını veya yönünü tahmin etmek amacıyla çok çeşitli yapay zekâ yöntemleri kullanılmıştır. Othan, Kilimci ve Uysal (2019) ile Othan ve Kilimci (2021), Türkçe sosyal medya yorumları üzerinden duygu analizi gerçekleştirerek BIST100 hisselerinin fiyat yönünü tahmin etmişlerdir. Bu çalışmalarda LSTM, CNN, RNN ve BERT ile ELMo gibi yeni nesil bağlamsal dil modelleri kullanılmıştır.  Koç (2021), BIST100'de yer alan bankacılık ve ulaşım hisseleri için Yapay Sinir Ağları (YSA) ve LSTM modellerini karşılaştırmalı olarak incelemiştir.  Aker (2022), yüksek oynaklığın olduğu dönemlerde LSTM modelinin Facebook Prophet modeline kıyasla BIST100 endeksini çok daha başarılı tahmin ettiğini ortaya koymuştur.  Çelik (2024), günlük kapanış fiyatlarını tahmin etmek için LSTM ve GRU modellerini kullanmıştır.  Bazı araştırmacılar modele farklı bağımsız değişkenler ekleyerek başarım artışı sağlamayı hedeflemiştir. Örneğin, Sönmez ve Coşkun Arslan (2024) BIST100 ve DAX endeksleri için teknik göstergeler yerine oynaklık endekslerini (VIX, GVZ vb.) girdi olarak alan LSTM tabanlı bir model geliştirmiştir. 
+[35] 2.2 Makine Öğrenmesi Modelleri
+[36] Finansal zaman serilerindeki doğrusal olmayan ilişkileri öğrenebilme yeteneklerinden dolayı literatürde  Random Forest (Ergenç ve Aktaş, 2025a; Ergenç ve Aktaş 2025b; Ozdes ve Koru, 2026), XGBoost (Ergenç ve Aktaş, 2025a; Ergenç ve Aktaş, 2025b; Ozdes ve Koru, 2026), LightGBM (Ağaslan, 2025; Ergenç ve Aktaş, 2025b), CatBoost (Ozdes ve Koru, 2026), MLP (Gür, 2024; Ozdes ve Koru, 2026), Karar Ağacı, AdaBoost ve GBM (Ergenç ve Aktaş, 2025b), SVR, ARIMA ve GARCH (Ağaslan, 2025), Lineer Regresyon (Ozdes ve Koru, 2026) ile CNN, KNN ve SVM (Gür, 2024) gibi çok çeşitli makine öğrenmesi, derin öğrenme ve istatistiksel modellerin kullanıldığı görülmektedir. 
+[37] Bu çalışmada, finansal zaman serilerindeki doğrusal olmayan ilişkileri öğrenebilme yeteneklerinden dolayı Doğrusal Regresyon, SVR, Random Forest, XGBoost, LightGBM ve CatBoost makine öğrenmesi algoritmaları seçilmiştir. 
+[38] 
+[39] 2.3 Derin Öğrenme Modelleri
+[40] Hisse senedi verilerindeki uzun vadeli zamansal bağımlılıkları ve karmaşık örüntüleri modelleyebilmek amacıyla çalışmamızda MLP, CNN, LSTM, GRU, BiLSTM, CNN-LSTM ve Transformer mimarileri karşılaştırmaya dâhil edilmiştir. Literatürde derin öğrenme modellerinin finansal tahmin gücünü inceleyen çok sayıda çalışma bulunmaktadır. 
+[41] Kilimci, Kilimci ve Yıldırım (2021), BIST100 fiyat tahmini için MLP, CNN ve LSTM modellerini Karar Birleştirme Stratejisi (DIS) çatısı altında bir araya getirerek tekil modellere göre hata oranlarını belirgin şekilde düşürmüştür. Sarıkoç ve Çelik (2022), teknik göstergeler ve boyut indirgeme teknikleri (PCA, ICA, FA) ile zenginleştirdiği veri setini LSTM modeline uygulayarak tahmin doğruluğunu artırmıştır. Varürer, Özaydın ve Çemrek (2025), LSTM, BiLSTM ve CNN-LSTM modellerini BIST100 tahmininde karşılaştırmış; evrişimsel katmanların yerel örüntü çıkarma yeteneğini LSTM'in ardışık veri işleme kapasitesiyle birleştiren CNN-LSTM hibrit modelinin en düşük hatayı elde ettiğini göstermiştir. Kosunalp ve Korkmaz (2025), oynaklık tahmininde geleneksel GARCH ailesi ile LSTM ve BiLSTM mimarilerini karşılaştırmıştır. Lu vd. (2025) tarafından yapılan kapsamlı literatür derlemesinde, CNN, RNN ve Transformer gibi derin öğrenme mimarilerinin karmaşık ve uzun vadeli bağımlılıklar içeren zaman serilerinde geleneksel yöntemlere sağladığı üstünlükler detaylandırılmıştır. 
+[42] 
+[43] 2.4 Açıklanabilir Yapay Zekâ
+[44] Makine öğrenmesi ve özellikle derin öğrenme modelleri genellikle birer "kara kutu" olarak değerlendirilmekte olup, üretilen tahminlerin hangi değişkenlerden ne şekilde etkilendiğinin belirlenmesi finansal yatırımcıların güvenini kazanmak açısından kritik bir öneme sahiptir. Bu bağlamda SHAP (SHapley Additive exPlanations), LIME (Local Interpretable Model-agnostic Explanations), PDP (Partial Dependence Plot), ICE (Individual Conditional Expectation) ve Özellik Önemi (Feature Importance) analizleri modellerin karar alma mekanizmalarını şeffaflaştırmaktadır.
+[45] Literatürde BIST100 tahmininde açıklanabilir yapay zekâ (XAI) kullanımı oldukça kısıtlıdır. Konuyla ilgili rastlanan nadir çalışmalardan biri olan Ergenç ve Aktaş (2025b), sektörel performans tahminlerinde SHAP değerlerinden faydalanmıştır. BIST100 literatüründe XAI tabanlı model şeffaflaştırma çalışmalarının bu denli eksik olması, mevcut çalışmamızın en önemli motivasyon kaynaklarından birini oluşturmaktadır.
+[46] 2.5 Benzerlikler ve Farklılıklar
+[47] Literatürdeki çalışmalar öznitelik mühendisliği stratejileri açısından değerlendirildiğinde üç belirgin yaklaşım öne çıkmaktadır. Birinci yaklaşımda, ham fiyat verileri (OHLCV) çok sayıda teknik göstergeyle zenginleştirilmekte, ancak ortaya çıkan yüksek boyutlu öznitelik uzayı doğrudan modele sunulmadan önce PCA, ICA ve FA gibi boyut indirgeme teknikleriyle daraltılmaktadır; Sarıkoç ve Çelik (2022) bu yöntemle 49 özniteliği 5, 8 ve 12 bileşene indirgemiştir. İkinci yaklaşımda çalışmalar teknik gösterge hesaplama yoluna hiç gitmeksizin, modeli doğrudan makroekonomik değişkenler veya küresel piyasa endeksleriyle beslemeyi tercih etmiştir (Sönmez ve Coşkun Arslan, 2024; Varürer vd., 2025; Kilimci vd., 2021). Üçüncü yaklaşımda ise özellik mühendisliğinden tamamen kaçınılmış, modele yalnızca ham OHLCV verisi veya tek başına kapanış fiyatı dizisi verilmiştir (Koç, 2021; Aker, 2022; Çelik, 2024; Ağaslan, 2025).
+[48] Bu çalışmada benimsenen yaklaşım, söz konusu üç eğilimden bilinçli bir şekilde ayrışmaktadır. Ham özniteliklerin (Open, High, Low, Close, Volume, USD/TRY, VIX) hiçbiri veri setinden çıkarılmamış veya bir ön eleme sürecine tabi tutulmamış; bunun aksine, bu temel değişkenlerin üzerine 21 teknik gösterge (RSI, MACD, Bollinger Bantları, ADX, CCI, Williams %R, OBV, Stokastik Osilatör, VWAP vb.) eklenerek toplam 28 özniteliklik bütünleşik ve bilgi kaybına uğramamış bir veri seti inşa edilmiştir (Tablo 2). Bu yönüyle çalışmamız, öznitelik uzayını daraltmak yerine ham ve türetilmiş bilgiyi bir arada koruyan Akturk et al. (2025) çalışmasıyla metodolojik bir paralellik göstermektedir; ilgili çalışmada da beş temel BIST100 değişkeni, 46 teknik gösterge ve dört temel gösterge herhangi bir indirgeme işlemine tabi tutulmadan doğrudan 55 özniteliklik bir set halinde modellere sunulmuştur. Bu ortak felsefe, literatürde daha çok istisnai bir tercih olarak öne çıkan "bilgiyi koruyarak zenginleştirme" stratejisinin, farklı veri ölçekleri ve piyasa bağlamlarında da tutarlı ve tercih edilebilir bir yöntem olduğunu göstermesi bakımından önemlidir.
+[49] Öte yandan iki çalışma, kapsam ve odak noktaları itibarıyla birbirini tamamlayıcı niteliktedir. Akturk et al. (2025), tek bir endeksi (BIST100) merkeze alarak S&P 500, Brent Petrol ve Ishares MSCI Turkey ETF gibi geniş kapsamlı dış piyasa değişkenleriyle 55 özniteliklik bir yapı kurgularken; bu çalışma, ulaştırma, sanayi, bankacılık, perakende ve enerji sektörlerini temsil eden altı farklı hisse senedi (THYAO, EREGL, AKBNK, GARAN, BIMAS, TUPRS) üzerinde, USD/TRY ve VIX ile odaklanmış bir makroekonomik girdi setini 28 özniteliklik daha kompakt bir yapıda birleştirmektedir. Bu tasarım tercihi, modellerin yalnızca tek bir endeks düzeyinde değil, farklı sektör dinamiklerine sahip hisseler üzerinde de genellenebilirliğinin sınanmasına imkân tanıması bakımından literatüre özgün bir katkı sunmaktadır.
+[50] 2.6 Literatüre Katkılar
+[51] Mevcut BIST100 tahmin çalışmaları incelendiğinde, bu çalışmanın literatüre sağlayacağı temel katkılar aşağıda maddeler hâlinde özetlenmiştir:
+[52] Açıklanabilirlik analizi eksikliğinin giderilmesi: Literatürdeki çalışmaların çok büyük bir kısmında modellerin tahmin süreçleri yorumlanmamıştır. Bu çalışmada SHAP ve LIME gibi gelişmiş XAI yöntemleri kullanılarak kapsamlı bir açıklanabilirlik sunulmaktadır. 
+[53] Kapsamlı model karşılaştırması eksikliği: Yakın tarihli bazı çalışmalar sektörel bazda ve farklı modellerle karşılaştırmalar yapsa da, makine öğrenmesi ve derin öğrenme modellerinin çok geniş bir yelpazede aynı veri seti üzerinde karşılaştırılması standart bir uygulama değildir. Çalışmamız 10'dan fazla modeli aynı koşullarda test etmektedir. 
+[54] Global ve yerel açıklamaların olmaması: Önceki çalışmalarda özellik önemi kısıtlı verilmişken, bu çalışmada hem tüm veri setini kapsayan küresel (global) açıklamalar hem de tekil günleri baz alan yerel (local) LIME ve Force Plot analizleri oluşturulmuştur.
+[55] Model güvenilirliği analizlerinin yetersizliği: Tahminlerin güvenilirliği istatistiksel testlerle (Wilcoxon, Diebold-Mariano vb.) ölçülerek literatürdeki güvenilirlik analizi eksikliği kapatılmıştır.
+[56] 
+[57] 3. VERİ KÜMESİ
+[58] 3.1 Veri Toplama
+[59] Bu çalışmada, finansal modellerin eğitilmesi ve test edilmesi amacıyla gerekli olan veri seti Yahoo Finance veritabanı üzerinden elde edilmiştir. Veri toplama süreci, Python programlama dili ve yfinance kütüphanesi kullanılarak tamamen otomatikleştirilmiştir. Çalışma kapsamında 01.01.2015 ve 01.01.2025 tarihleri arasındaki 10 yıllık periyodu kapsayan günlük frekanstaki borsa verileri çekilmiştir. Borsa hisse fiyatlarına ek olarak, makroekonomik etkilerin modellere dahil edilebilmesi amacıyla USD/TRY (Dolar/TL) döviz kuru ve küresel risk iştahını ölçen VIX (Korku Endeksi) verileri de aynı veri kaynağından eşzamanlı olarak toplanıp ana veri setine entegre edilmiştir. 
+[60] 
+[61] 3.2 Kullanılan Hisseler
+[62] Modellerin performansının farklı sektör dinamikleri üzerinde değerlendirilebilmesi için BIST100 endeksini temsil gücü yüksek, işlem hacmi ve piyasa değeri bakımından önde gelen 6 büyük şirketin hisse senedi seçilmiştir. Bu hisseler sırasıyla; Türk Hava Yolları (THYAO), Ereğli Demir ve Çelik Fabrikaları (EREGL), Akbank (AKBNK), Garanti BBVA (GARAN), BİM Birleşik Mağazalar (BIMAS) ve Tüpraş (TUPRS)'tır. Seçilen hisseler ulaştırma, sanayi, bankacılık, perakende ve enerji gibi farklı sektörleri temsil ederek modellerin genellenebilirliğinin (generalization) artırılmasını sağlamıştır
+[63] 3.3 Kullanılan Özellikler
+[64] Zaman serisi tahminlerinde modellerin girdi olarak kullanacağı özelliklerin (features) seçimi tahmin başarısını doğrudan etkilemektedir. Çalışmada Yahoo Finance üzerinden alınan ham fiyat verilerine (Açılış - Open, En Yüksek - High, En Düşük - Low, Kapanış - Close, İşlem Hacmi - Volume) ek olarak makroekonomik değişkenler (USD/TRY ve VIX) kullanılmıştır. Fiyat verilerinin içerdiği gizli örüntüleri (trend, momentum, volatilite vb.) ortaya çıkarmak amacıyla çok boyutlu bir teknik gösterge seti hesaplanmış ve modele dâhil edilmiştir. Kullanılan ham ve teknik göstergeler şunlardır:
+
+Tablo 2. Temel ve teknik göstergeler
+[65]  
+[66] 
+[67] 3.4 Veri Ön İşleme
+
+Eksik Veri ve Aykırı Değer Yönetimi: Veri setindeki eksik gözlemler, üç farklı doldurma yöntemi (İleri Doldurma, KNN Imputer, Doğrusal Enterpolasyon) arasından yapılan ampirik karşılaştırma sonucunda en başarılı bulunan doğrusal enterpolasyon yöntemiyle giderilmiştir. Uç kısımlardaki boşluklar için ileri/geri doldurma (forward/backward fill) yöntemleri kullanılmıştır. Finansal piyasalarda gözlemlenen ani fiyat şokları, piyasa dinamiklerinin gerçek birer yansıması olduğundan, istatistiksel aykırı değerler (outliers) veri setinden silinmemiş ve korunmuştur. Detaylı karşılaştırma analizleri ve aykırı değer dağılımları Bölüm 5.1.3'te sunulmuştur.
+[68] Tablo 3.1. Veri seti analizi
+[69] 
+[70] 
+[71] 
+[72] Şekil 3.1. Temel finansal ve makroekonomik özelliklere ait kutu grafikleri ve aykırı değer dağılımları 
+[73] 
+[74] Şekil 3.2. Trend, hacim ve volatilite göstergelerine ait kutu grafikleri ve aykırı değer dağılımları 
+[75] 
+[76] Şekil 3.3. Momentum ve osilatör göstergelerine ait kutu grafikleri ve aykırı değer dağılımları 
+[77] 
+[78] Veri Bölme (Time-Series Split) ve Doğrulama (Validation): Veri sızıntısını (data leakage) önlemek amacıyla veri seti rastgele değil, kronolojik olarak %70 eğitim (train), %15 doğrulama (validation) ve %15 test (test) seti olacak şekilde ayrılmıştır. Buna ek olarak, modellerin aşırı öğrenmesini (overfitting) engellemek ve hiperparametre optimizasyonunu sağlıklı yapabilmek için doğrulama (validation) stratejileri kullanılmıştır. Aşırı öğrenmeyi (overfitting) engellemek ve hiperparametre optimizasyonunu sağlıklı yapabilmek için makine öğrenmesi modellerinde eğitim seti kendi içinde 3 katlı Zaman Serisi Çapraz Doğrulaması'na (Time-Series Cross Validation) tabi tutulurken, derin öğrenme modellerinde doğrulama seti üzerinde 'erken durdurma' (early stopping) mekanizması uygulanmıştır.
+[79] 
+[80] 4. ÖNERİLEN AÇIKLANABİLİR TAHMİN ÇERÇEVESİ
+[81] Bu çalışmada, BIST 100 endeksinde yer alan ve farklı sektörleri (ulaştırma, sanayi, bankacılık, perakende, enerji) temsil eden altı lider hisse senedinin fiyat hareketlerinin yüksek doğrulukla tahmin edilmesi ve bu tahminlerin ardındaki karar mekanizmalarının şeffaf biçimde ortaya konması amacıyla kapsamlı bir Açıklanabilir Tahmin Çerçevesi (Explainable Forecasting Framework) tasarlanmıştır. Önerilen mimari, ham verinin modele girdiği ilk aşamadan tahmin sonuçlarının yorumlandığı son aşamaya kadar birbirini bütünleyici biçimde takip eden modüler adımlardan oluşmaktadır.
+[82] Çerçevenin ilk aşamasında, ilgili hisse senetlerine ait geçmiş fiyat ve hacim verileri ile küresel piyasa risk iştahını temsil eden makroekonomik değişkenler (USD/TRY, VIX), 2015-2025 dönemini kapsayan 10 yıllık zaman serisi formatında elde edilmiştir. Veri setindeki eksik gözlemler, alternatif algoritmalar arasından deneysel olarak en yüksek başarıyı gösterdiği tespit edilen doğrusal enterpolasyon yöntemiyle giderilmiş; buna karşılık finansal piyasaların doğal şoklarını yansıtan aykırı değerler (outliers), modelin gerçek piyasa dinamiklerini öğrenebilmesi amacıyla veri setinden çıkarılmaksızın korunmuştur. Ön işleme adımlarının ardından gerçekleştirilen özellik mühendisliği (feature engineering) aşamasında, 7 temel özelliğe trend, momentum ve hacim tabanlı 21 farklı teknik gösterge eklenerek, boyut indirgeme uygulanmaksızın 28 özniteliklik bütünleşik bir veri yapısı oluşturulmuştur.
+[83] Elde edilen bu genişletilmiş özellik seti, modelin genellenebilirliğini sağlamak ve veri sızıntısını önlemek amacıyla kronolojik sırayla %70 eğitim, %15 doğrulama (validation) ve %15 test kümelerine ayrılmıştır. Aşırı öğrenmeyi (overfitting) engellemek amacıyla makine öğrenmesi modellerinde eğitim seti üzerinde 3 katlı Zaman Serisi Çapraz Doğrulaması (Time-Series Cross-Validation) uygulanırken; derin öğrenme modellerinde ise ayrılan bu bağımsız doğrulama seti kullanılmış ve erken durdurma (early stopping) mekanizması modele entegre edilmiştir. Eğitilen modeller aracılığıyla bir sonraki işlem gününe (T+1) yönelik regresyon tahminleri üretildikten sonra, elde edilen sonuçların istatistiksel güvenilirliği Wilcoxon ve Diebold-Mariano testleriyle sınanmış; çalışmanın son aşamasında ise SHAP, LIME, PDP ve ICE gibi yöntemlerle kapsamlı bir açıklanabilirlik (XAI) analizi gerçekleştirilmiştir.
+[84] 
+[85] 
+[86] 4.1 Kullanılan Makine Öğrenmesi Modelleri
+[87] 
+[88] Finansal zaman serilerindeki doğrusal olmayan ilişkileri öğrenebilme yetenekleri ve güncel literatürdeki başarıları (Ağaslan, 2025; Özdeş ve Koru, 2026) dikkate alınarak, bu çalışmada altı farklı makine öğrenmesi algoritması seçilmiştir. Doğrusal Regresyon (Linear Regression), bağımsız değişkenler ile hedef değişken arasındaki doğrusal ilişkiyi modelleyen ve diğer karmaşık algoritmaların performansının karşılaştırılmasında temel çizgi (baseline) model olarak kullanılmıştır. Destek Vektör Regresyonu (SVR), marjin maksimizasyonu prensibi ve çekirdek (kernel) fonksiyonları sayesinde doğrusal olmayan karmaşık yapıları modelleyebilme kapasitesi nedeniyle sisteme dâhil edilmiştir. Topluluk öğrenme (ensemble) yöntemleri bağlamında, veri setindeki gürültüye karşı yüksek direnç gösteren Rastgele Orman (Random Forest) algoritması kullanılmıştır. Bunlara ek olarak, BIST100 gibi yüksek volatilite barındıran serilerde hata oranını ardışık ağaç yapılarıyla minimize eden XGBoost (eXtreme Gradient Boosting); yaprak odaklı büyüme stratejisiyle hızlı ve isabetli sonuçlar üreten LightGBM; ve özellikle gürültülü verilerde aşırı öğrenme riskini doğal olarak azaltan CatBoost (Categorical Boosting) gradyan artırma mimarileri, çalışmanın makine öğrenmesi bileşenini oluşturmaktadır. 
+[89] 4.2 Kullanılan Derin Öğrenme Modelleri
+[90] 
+[91] Hisse senedi verilerindeki uzun vadeli zamansal bağımlılıkların ve karmaşık örüntülerin (temporal patterns) çok boyutlu biçimde modellenebilmesi amacıyla, literatürde etkinliği kanıtlanmış (Lu vd., 2025; Kilimci vd., 2021) yedi farklı derin öğrenme mimarisi karşılaştırmaya dâhil edilmiştir. Temel mimarilerden Çok Katmanlı Algılayıcı (MLP), doğrusal olmayan aktivasyon fonksiyonları aracılığıyla değişkenler arası karmaşık ilişkileri öğrenirken; Evrişimli Sinir Ağları (CNN), tek boyutlu evrişim filtreleri yoluyla seri içerisindeki yerel trendleri ve kısa vadeli fiyat kalıplarını tespit etmektedir. Geleneksel sinir ağlarının uzun dönemli hafıza sınırlarını aşmak amacıyla geliştirilen Uzun Kısa Süreli Bellek (LSTM) ve daha düşük hesaplama maliyeti sunan Geçitli Tekrarlayan Birim (GRU) modelleri, çalışmada temel ardışık işlemciler olarak konumlandırılmıştır. Modelin bağlamsal öğrenme kapasitesini artırmak amacıyla, veriyi her iki yönde de işleyebilen Çift Yönlü LSTM (BiLSTM) ile evrişimsel ve tekrarlayan yapıları bir arada barındıran CNN-LSTM hibrit mimarisi kullanılmıştır. Son olarak, geçmişteki piyasa şoklarının güncel fiyatlar üzerindeki etkisini öz-dikkat (self-attention) mekanizması aracılığıyla doğrudan ağırlıklandırabilen Transformer mimarisi sisteme entegre edilerek derin öğrenme çerçevesi tamamlanmıştır. 
+[92] 4.3 Açıklanabilir Yapay Zekâ Katmanı
+[93] 
+[94] Literatürdeki BIST100 tahmin çalışmalarının çoğunlukla yalnızca performans metrikleriyle (MAE, RMSE vb.) sınırlı kalması ve model karar süreçlerinin yorumlanmaması önemli bir araştırma boşluğu oluşturmaktadır. Makine öğrenmesi ve derin öğrenme modellerinin "kara kutu" doğasını şeffaflaştırmak amacıyla, bu çalışmada kapsamlı bir Açıklanabilir Yapay Zekâ (XAI) katmanı kurgulanmıştır. Bu çerçevede model çıktıları hem küresel (global) hem de yerel (local) düzeyde incelenmektedir. SHAP algoritması aracılığıyla özelliklerin modele sağladığı genel marjinal katkılar hesaplanmış; değişkenlerin "Momentum", "Trend", "Volatilite" ve "Makroekonomi" gibi alt kategorilere ayrılmasıyla modelin hangi piyasa koşullarında hangi değişkenlere ağırlık verdiği tespit edilmiştir. Belirli işlem günlerindeki sıra dışı fiyat hareketlerinin (örneğin ani kur şokları veya VIX artışları) ardındaki spesifik itici güçlerin saptanması amacıyla LIME ve SHAP Force Plot yöntemlerinden faydalanılmıştır. Buna ek olarak, PDP (Partial Dependence Plot) ve ICE analizleriyle bağımsız değişkenlerin hedef hisse üzerindeki yapısal etkileri modellenmiştir.
+[95] 
+[96] 5. DENEYSEL ÇALIŞMALAR
+[97] 5.1 Veri Kümesinin Analizi
+[98] !!! Veri kümesinde aşağıdaki başlıklarda analiz yapalım. 
+[99] Fiyat dağılımı 
+[100] Korelasyon 
+[101] Trend
+[102] Aşağıdaki gibi bir içerik olabilir.
+[103] 
+[104] Bu çalışmada, BIST100 endeksinde işlem gören altı lider hisse senedinin (THYAO, EREGL, AKBNK, GARAN, BIMAS, TUPRS) 2015-2025 yıllarını kapsayan günlük verileri Yahoo Finance üzerinden elde edilmiştir. Ham veri kümesi, geleneksel OHLCV (Açılış, Yüksek, Düşük, Kapanış, Hacim) değişkenlerinin yanı sıra makroekonomik bağlamı yansıtması amacıyla USD/TRY kuru ve VIX korku endeksini içermektedir. Fiyat hareketlerinin doğrusal olmayan dinamiklerini ve piyasa eğilimlerini modelleyebilmek için söz konusu ham verilere ek olarak RSI, MACD, EMA, SMA, Bollinger Bantları, ATR, ADX, Momentum, ROC, CCI, OBV ve Williams %R gibi 21 farklı teknik gösterge hesaplanmış; böylece boyut indirgeme yapılmaksızın 28 öznitelikli bütünleşik bir yapı kurulmuştur. Model eğitimlerinde geleceğe dair veri sızıntısını (data leakage) engellemek amacıyla %70 eğitim, %15 doğrulama ve %15 test kümeleri kronolojik (time-series split) olarak ayrılmıştır. Veri kalitesini sağlamak adına eksik gözlemler, test edilen doldurma algoritmaları arasından en başarılı sonucu veren doğrusal enterpolasyon yöntemiyle giderilmiştir. Ancak, gelişmekte olan piyasalarda yaşanan ani fiyat değişimleri modelin öğrenmesi gereken gerçekçi finansal şokları temsil ettiğinden, istatistiksel aykırı değerler (outliers) veri kümesinden çıkarılmamış ve korunmuştur.
+[105] Veri kümesine ait tanımlayıcı istatistikler Tablo 5.1'de özetlenmiştir. İlgili istatistikler incelendiğinde; açılış, yüksek, düşük ve kapanış fiyatlarının beklenen şekilde benzer dağılım özellikleri (yaklaşık 29.4 TL ortalama) gösterdiği ve kendi içlerinde oldukça yüksek bir korelasyon sergilediği görülmektedir. Buna karşın, piyasadaki alım-satım iştahının temel bir göstergesi olan işlem hacmi ile piyasa stresini yansıtan ATR ve MACD gibi değişkenlerin olağandışı yüksek standart sapma, pozitif çarpıklık ve ekstrem basıklık (kurtosis) değerlerine sahip olduğu saptanmıştır (Örneğin; işlem hacminin basıklık değeri 19.98 olarak hesaplanmıştır). Bu durum, finansal serilerde sıklıkla karşılaşılan, ani haber akışlarıyla tetiklenen aşırı oynaklık ve volatilite yığılmalarının (volatility clustering) veri setimizdeki güçlü varlığını destekler niteliktedir.
+[106] 
+[107] 
+[108] 5.1.1 Veri Kümesinin Genel Özellikleri
+[109] Çalışmada kullanılan veri kümesi, Borsa İstanbul (BIST100) pazarında farklı sektörleri domine eden hisse senetleri için Yahoo Finance üzerinden 2015-2025 yılları arasını kapsayacak şekilde günlük frekansta elde edilmiştir. Modelleme aşamasında her bir kayıt (işlem günü) aşağıdaki temel finansal ve makroekonomik değişkenleri içermektedir:
+[110] Açılış fiyatı (Open)
+[111] Gün içi en yüksek fiyat (High)
+[112] Gün içi en düşük fiyat (Low)
+[113] Kapanış fiyatı (Close) 
+[114] İşlem hacmi (Volume)
+[115] Dolar/TL Kuru (USD/TRY)
+[116] Korku Endeksi (VIX)
+[117] Sadece nominal fiyatların model tahmini için yetersiz kalacağı göz önüne alınarak, piyasa davranışını daha iyi temsil edebilmek amacıyla geniş bir teknik analiz seti algoritmik olarak hesaplanmıştır. Bunlar arasında SMA, EMA, RSI, MACD (ve MACD Histogramı), Bollinger Bantları, ATR, ADX, Momentum, CCI, Williams %R, Stokastik Osilatör (Stoch_K, Stoch_D), OBV, VWAP (Hacim Ağırlıklı Ortalama Fiyat) ile Günlük Getiri ve Volatilite_10 gibi özellikler dahil olmak üzere projeye özel toplam 21 yeni gösterge türetilmiştir. Böylece her bir işlem günü yalnızca izole bir fiyat bilgisiyle değil; o günün piyasa trendini, volatilitesini, momentumunu ve makroekonomik stresini temsil eden tam 28 boyutlu özellik vektörleriyle modellenmiştir.
+[118] Oluşturulan bu 28 boyutlu veri kümesi zaman serisi yapısına sahip olduğundan, verinin kronolojik sırası mutlak surette korunmuştur. Kümeler oluşturulurken rastgele örnekleme (random sampling) yerine zaman tabanlı ayrıştırma (time-series split) yöntemi tercih edilmiş ve verinin kronolojik olarak %70'lik dilimi eğitim, %15'lik dilimi doğrulama ve son %15'lik dilimi ise test seti olarak bölünmüştür. Böylece test aşamasında geleceğe ait bilgilerin eğitim sürecine sızması (data leakage) kesin olarak engellenmiş ve modeller yalnızca "görmedikleri" (out-of-sample) veriler üzerinde sınanmıştır.
+[119] 
+[120] 
+[121] 5.1.2 İstatistiksel Analiz
+[122] İlk aşamada algoritmaların öğrenme sürecini doğrudan etkileyen veri kümesine ait temel istatistiksel özellikler incelenmiştir. Tüm değişkenler için ortalama, medyan, standart sapma, minimum, maksimum, çarpıklık (Skewness) ve basıklık (Kurtosis) değerleri hesaplanarak veri dağılımları analiz edilmiştir.
+[123] Yapılan incelemede, özellikle işlem hacmi değişkeninin devasa bir varyans (yaklaşık 74.9 milyon standart sapma) gösterdiği; fiyat serilerinin ise BIST100'deki farklı hisse senetlerine bağlı olarak değişen spesifik volatilite karakteristiklerine sahip olduğu gözlenmiştir. Kapanış fiyatlarındaki çarpıklık katsayısının (3.25) pozitif yönde yüksek olması, fiyat değişimlerinin simetrik bir dağılım göstermediğini ve zaman içinde agresif yukarı yönlü sıçramalar yaşandığını ortaya koymaktadır. Benzer şekilde, işlem hacmi (19.98) ve ATR (8.63) gibi değişkenlerdeki yüksek basıklık (kurtosis) değerleri, finansal zaman serilerinde beklenen ani fiyat hareketlerinin, piyasa şoklarının ve uç değerlerin veri setimizdeki güçlü varlığını matematiksel olarak desteklemektedir.
+[124] 
+[125] Şekil 5.1. Kapanış fiyatlarının zaman içerisindeki değişimi.
+[126] 
+[127] Şekil 5.2. İşlem hacimlerinin zamana göre dağılımı.
+[128] Tablo 5.1. Veri kümesine ait tanımlayıcı istatistikler.
+[129] 
+[130] Tablo 5.1. Veri kümesine ait tanımlayıcı istatistikler.
+[131] !!! Tablodan sonra aşağıdaki gibi bir açıklama yapılırsa iyi olur.
+[132] Bu tabloda yer alan istatistiksel değerler, veri kümesinin temel dağılım özelliklerini ortaya koymaktadır. Açılış, en yüksek, en düşük ve kapanış fiyatlarının birbirine çok yakın ortalama (yaklaşık 29.4 TL) ve standart sapma değerlerine sahip olması, bu dört fiyat serisinin kendi içlerinde mükemmele yakın bir korelasyon gösterdiğine işaret etmektedir. Buna karşın işlem hacmi değişkeninin yüksek standart sapma ve pozitif çarpıklık (3.41) değerlerine sahip olması, piyasada standart günlerin yanı sıra haber akışlarına bağlı olarak dönemsel ve son derece yoğun işlem hacmi patlamalarının (volatility clustering) oluştuğunu göstermektedir.
+[133] Teknik göstergeler incelendiğinde; momentumun temel ölçütlerinden RSI değişkeninin 53.60 gibi bir ortalama değere sahip olması, incelenen 10 yıllık periyotta veri kümesinin genel olarak dengeli alım-satım bölgelerini içerdiğini göstermektedir. ATR (Ortalama Gerçek Aralık) ve Bollinger Bant Genişliği (BB_Width) değişkenlerinin yüksek standart sapmalar üretmesi, BIST100'deki volatilitenin zaman içinde (özellikle kriz dönemlerinde) önemli ölçüde farklılaştığını ortaya koymaktadır. Özellikle işlem hacmi (19.98), MACD Histogramı (28.63) ve ATR (8.63) değişkenlerinde gözlenen olağandışı basıklık değerleri, finansal zaman serilerinde sıkça görülen aşırı oynaklık, trend kırılımları ve kuyruk riski (tail risk) davranışlarını net bir şekilde yansıtmaktadır.
+[134] 5.1.3 Eksik Veri ve Aykırı Değer Analizi
+[135] Makine öğrenmesi ve derin öğrenme algoritmalarının performansını doğrudan etkileyen veri kalitesinin sağlanması amacıyla eksik gözlemler ve aykırı değerler kapsamlı bir şekilde analiz edilmiştir. Yaklaşık 10 yıllık devasa zaman serisinde eksik kayıtların (missing values) oranının sıfıra yakın, oldukça düşük bir seviyede olduğu görülmüştür. Çalışmanın ön işleme aşamasında, eksik verilerin giderilme stratejisinin modelleme üzerindeki etkilerini ampirik olarak gözlemlemek amacıyla İleri Doldurma (Forward Fill), K-En Yakın Komşu (KNN Imputer) ve Doğrusal Enterpolasyon (Linear Interpolation) olmak üzere üç farklı yöntem kullanılarak üç ayrı veri seti türetilmiştir.
+[136] Bu üç yöntemin performans farkını ölçmek amacıyla, BIST100 endeksine yönelik güncel literatürde (Ergenç ve Aktaş, 2025b; Ağaslan, 2025) hesaplama verimliliği ve düşük hata oranlarıyla finansal zaman serilerinde üstün bir modelleme kapasitesine sahip olduğu vurgulanan LightGBM algoritması tercih edilmiştir. Sabit hiperparametreler ve tüm teknik göstergeler kullanılarak eğitilen LightGBM modelinin test seti sonuçlarına göre (Şekil 5.3); en düşük Hata Kareler Ortalaması Karakökü (RMSE = 68.81) ve en yüksek açıklayıcılık oranı (R² = 0.3714), Doğrusal Enterpolasyon uygulanmış veri setinden elde edilmiştir. Zaman serilerindeki fiyatın ardışık dizilişini bozarak yapay durağanlık yaratan İleri Doldurma (R² = 0.3657) ile zaman bağlamını dikkate almayan KNN (R² = 0.3630) nispeten zayıf kalmıştır. Elde edilen bu kanıta dayalı bulgular neticesinde, asıl analizlerde modellerin eğitilmesi için, test edilen doldurma algoritmaları arasından en başarılı sonucu veren doğrusal enterpolasyon (ve uç noktalar için ileri/geri doldurma) yöntemiyle giderilmiş ana veri seti kullanılmıştır.
+[137]  
+[138] Şekil 5.3. Farklı Doldurma Yöntemlerinin Performans Karşılaştırması.
+[139] 
+[140] Standart veri bilimi problemlerinin aksine, finansal piyasalardaki ani fiyat değişimleri (spike) birer veri hatası değil; bizzat piyasanın makroekonomik kararlara, krizlere veya jeopolitik şoklara verdiği gerçek reaksiyonlardır. Bu nedenle, aykırı değerler (outliers) doğrudan veri kümesinden çıkarılmamıştır. Tüm veri setindeki 28 farklı özelliğin varyanslarını ve aykırı değer dağılımlarını aynı düzlemde karşılaştırabilmek amacıyla Min-Max ölçeklendirmesi kullanılarak bütünleşik bir kutu grafiği (Şekil 5.4) oluşturulmuştur. Çeyrekler Arası Açıklık (IQR) yöntemiyle görselleştirilen bu uç değerlerin büyük bölümünün, VIX endeksinin sıçradığı yüksek volatilite dönemlerine ve ekstrem hacim patlamalarına karşılık geldiği tespit edilmiştir. Sonuç olarak, istatistiksel açıdan aykırı görünen bu veriler korunarak, modellerin kuyruk risklerini (tail risk) ve olağandışı gerçek piyasa koşullarını öğrenmesi sağlanmıştır.
+[141] 
+[142] 
+[143] 
+[144] 
+[145] Şekil 5.4. Özelliklere ait Box Plot grafikleri.
+[146] 
+[147] 5.1.4 Korelasyon Analizi
+[148] Makine öğrenmesi modellerinin başarısını etkileyen önemli faktörlerden biri bağımsız değişkenler arasındaki ilişkilerin ve örtüşmelerin (bağımlılıkların) derecesidir. Bu amaçla 28 özelliğin tamamını kapsayan Pearson korelasyon katsayıları hesaplanmış ve korelasyon matrisi (Şekil 5.5) oluşturulmuştur. Gerçekleştirilen analiz sonucunda; açılış (Open), en yüksek (High), en düşük (Low) ve kapanış (Close) fiyatları arasında beklendiği üzere mükemmele yakın pozitif doğrusal ilişkiler (r > 0.99) gözlenmiştir. Benzer şekilde, VWAP, EMA_20 ve MA_10 gibi trend tabanlı teknik göstergelerin de fiyat değişkenleriyle aşırı yüksek bir korelasyona (r > 0.99) sahip olduğu saptanmıştır. Makroekonomik bağlamda incelendiğinde, USD/TRY döviz kuru ile kapanış fiyatları arasında güçlü bir pozitif korelasyon (r = 0.71) olduğu, piyasa risk iştahını ölçen VIX korku endeksinin ise kapanış fiyatlarıyla zayıf negatif yönlü (r = -0.06) bir ilişki sergilediği tespit edilmiştir.
+[149] Korelasyon analizi, modellerin eğitim sürecinde sapmalara yol açabilecek 'çoklu doğrusal bağlantı (multicollinearity)' riskinin belirlenmesinde kritik bir rol oynamaktadır. Fiyat serileri ve hareketli ortalamalar arasındaki bu yüksek korelasyon yığılması, SHAP ve LIME gibi açıklanabilir yapay zekâ (XAI) algoritmalarının özellik önem (feature importance) sıralamalarını yorumlarken özellikle dikkate alınmıştır. Doğrusal modellerin aksine, bu çalışmada tercih edilen Karar Ağacı tabanlı topluluk algoritmaları (LightGBM, XGBoost, Random Forest), yapıları gereği çoklu doğrusal bağlantı sorununa karşı dirençli olduklarından, özellik uzayında herhangi bir indirgemeye gidilmeden modelleme süreci başarıyla tamamlanmıştır.
+[150] 
+[151] 
+[152] 
+[153] Şekil 5.5. BIST100 özelliklerine ait Pearson Korelasyon Matrisi.
+[154] 
+[155] 
+[156] 5.1.5 Dağılım Analizi
+[157] Veri kümesindeki her bir özelliğin dağılımı histogramlar ve yoğunluk (Kernel Density Estimation) eğrileri kullanılarak incelenmiştir.
+[158] Analizler, finansal zaman serilerinin normal dağılım varsayımını tam olarak sağlamadığını göstermektedir. Özellikle günlük getiri serilerinde kalın kuyruklu (fat-tail) dağılımlar ve yüksek volatilite dönemleri belirgin biçimde gözlenmektedir. Bu durum doğrusal modeller yerine doğrusal olmayan öğrenme algoritmalarının kullanılmasının gerekliliğini desteklemektedir.
+[159] 
+[160] Şekil 5.5. Özellik dağılımları.
+[161] 
+[162] 5.1.6 Zaman Serisi Karakteristikleri
+[163] Finansal verilerin zamansal bağımlılığını incelemek amacıyla hareketli ortalamalar, volatilite eğrileri ve otokorelasyon analizleri gerçekleştirilmiştir.
+[164] Sonuçlar, fiyat serilerinin belirli dönemlerde trend davranışı sergilediğini, bazı dönemlerde ise yüksek oynaklık nedeniyle durağan olmayan yapı gösterdiğini ortaya koymaktadır. Ayrıca volatilitenin zaman içerisinde kümelendiği (volatility clustering) gözlenmiştir. Bu durum, geçmiş fiyat bilgilerinin gelecekteki fiyat hareketlerini belirli ölçüde etkilediğini göstermekte ve LSTM, GRU ve Transformer gibi sıralı veri modellerinin kullanımını desteklemektedir.
+[165] Şekil 5.6. Hareketli ortalama ve volatilite grafiği.
+[166] 
+[167] 5.1.7 Özellik Öneminin Ön Analizi
+[168] Açıklanabilir yapay zekâ analizlerinden önce değişkenlerin tahmin performansına olası katkıları ön değerlendirme amacıyla incelenmiştir. Random Forest tabanlı başlangıç özellik önem analizi sonucunda, işlem hacmi, RSI, MACD, EMA20 ve ATR göstergelerinin fiyat tahminine daha yüksek katkı sağladığı gözlenmiştir.
+[169] Bu ön analiz yalnızca genel eğilimleri ortaya koymak amacıyla gerçekleştirilmiş olup, ayrıntılı açıklanabilirlik değerlendirmeleri SHAP ve LIME yöntemleri kullanılarak sunulacaktır.
+[170] 
+[171] Şekil 5.7. Ön özellik önem grafiği.
+[172] 5.2 Tahmin Performansları
+[173] Bu bölümde, BIST100 hisse senedi fiyat tahmini probleminde kullanılan makine öğrenmesi ve derin öğrenme modellerinin tahmin performansları karşılaştırmalı olarak değerlendirilmiştir. Tüm modeller aynı eğitim, doğrulama ve test veri kümeleri üzerinde eğitilmiş ve aynı veri ön işleme adımları uygulanarak adil bir karşılaştırma ortamı oluşturulmuştur. Tahmin başarısının çok yönlü değerlendirilebilmesi amacıyla farklı hata ölçütleri birlikte kullanılmıştır.
+[174] MAE (Mean Absolute Error): Tahmin hatalarının mutlak ortalamasını göstermektedir. Daha düşük MAE değeri daha başarılı tahmin performansını ifade etmektedir.
+[175] RMSE (Root Mean Square Error): Büyük hataları daha fazla cezalandıran hata ölçütüdür. Finansal zaman serilerindeki ani fiyat değişimlerinin modele etkisini değerlendirmede önemlidir.
+[176] MAPE (Mean Absolute Percentage Error): Hatanın yüzde cinsinden ifade edilmesini sağlayarak farklı ölçeklerdeki hisselerin karşılaştırılmasına olanak tanımaktadır.
+[177] R² (Coefficient of Determination): Modelin veri varyansını açıklama gücünü göstermektedir. R² değerinin 1'e yaklaşması model başarısının arttığını göstermektedir.
+[178] Tablo 5.2'de kullanılan tüm makine öğrenmesi ve derin öğrenme modellerinin test veri kümesi üzerindeki performans sonuçları sunulmaktadır.
+[179] 
+[180] Tablo 5.2. Makine öğrenmesi ve derin öğrenme modellerinin performans karşılaştırması
+[181] Tablo 5.2 incelendiğinde doğrusal regresyon modelinin en düşük performansı gösterdiği, doğrusal olmayan makine öğrenmesi algoritmalarının ise belirgin şekilde daha başarılı sonuçlar ürettiği görülmektedir. Özellikle ağaç tabanlı yöntemler olan XGBoost, LightGBM ve CatBoost modelleri klasik yöntemlere göre daha düşük hata değerlerine ulaşmıştır.
+[182] Derin öğrenme modelleri incelendiğinde zaman bağımlılığını öğrenebilen LSTM, GRU ve BiLSTM mimarilerinin klasik makine öğrenmesi yöntemlerine göre daha başarılı olduğu görülmektedir. En yüksek tahmin performansı ise uzun dönem bağımlılıklarını daha etkin öğrenebilen Transformer modeli tarafından elde edilmiştir.
+[183] Performans sonuçlarının daha kolay yorumlanabilmesi amacıyla hata metrikleri grafiksel olarak da gösterilmiştir.
+[184] 
+[185] Şekil 5.8. Modellerin MAE karşılaştırması.
+[186] 
+[187] Şekil 5.9. Modellerin RMSE karşılaştırması.
+[188] 
+[189] Şekil 5.10. Modellerin MAPE karşılaştırması.
+[190] 
+[191] Şekil 5.11. Modellerin R² karşılaştırması.
+[192] 
+[193] Grafikler incelendiğinde makine öğrenmesi modellerinden derin öğrenme modellerine doğru hata değerlerinin düzenli biçimde azaldığı görülmektedir. Özellikle Transformer, CNN-LSTM ve BiLSTM modelleri hemen hemen tüm performans ölçütlerinde en başarılı sonuçları üretmiştir.
+[194] Makine öğrenmesi algoritmaları arasında CatBoost ve LightGBM modelleri fiyat hareketlerindeki doğrusal olmayan ilişkileri başarılı şekilde modelleyebilmiştir. Özellikle teknik göstergeler kullanıldığında bu modellerin doğrusal regresyon ve destek vektör regresyonuna göre daha düşük hata oranları elde ettiği gözlenmiştir.
+[195] Derin öğrenme modelleri ise zaman serilerindeki uzun dönem bağımlılıklarını öğrenebilme yetenekleri sayesinde daha başarılı tahminler üretmiştir. LSTM ve BiLSTM modelleri ardışık fiyat hareketlerini etkili biçimde öğrenirken, CNN-LSTM modeli hem yerel örüntüleri hem de zamansal bağımlılıkları birlikte modelleyebilmiştir.
+[196] Transformer modeli ise çok başlıklı dikkat (Multi-Head Attention) mekanizması sayesinde farklı zaman aralıklarındaki ilişkileri eşzamanlı öğrenebilmiş ve en düşük hata oranına ulaşmıştır.
+[197] Elde edilen sonuçlar, finansal zaman serilerinin yüksek derecede doğrusal olmayan yapıya sahip olduğunu göstermektedir. Doğrusal regresyon modelinin başarısız olmasının temel nedenlerinden biri de, Bölüm 5.1.4'teki Korelasyon Analizi'nde tespit edilen çoklu doğrusal bağlantı (multicollinearity) sorunudur. Doğrusal modeller bu sorundan olumsuz etkilenirken, ağaç tabanlı algoritmalar ve derin öğrenme modelleri daha başarılı sonuçlar üretmiştir.
+[198] Bununla birlikte en düşük hata değerine sahip modelin her zaman en güvenilir model olduğu söylenemez. Finansal uygulamalarda model doğruluğu kadar modelin hangi değişkenleri kullanarak karar verdiğinin anlaşılması da büyük önem taşımaktadır. Özellikle yatırım karar destek sistemlerinde yalnızca doğru tahmin yapılması değil, tahminin neden yapıldığının da açıklanabilir olması beklenmektedir.
+[199] Bu nedenle performans değerlendirmesinin ardından modellerin karar mekanizmaları SHAP ve LIME tabanlı açıklanabilir yapay zekâ yöntemleri kullanılarak ayrıntılı biçimde analiz edilmiştir.
+[200] 
+[201] 5.3 Gerçek-Tahmin Eğrileri
+[202] Bu bölümde, makine öğrenmesi ve derin öğrenme modelleri tarafından üretilen tahmin değerleri gerçek kapanış fiyatları ile karşılaştırılmıştır. Gerçek-tahmin eğrileri, modellerin yalnızca sayısal performans ölçütleri açısından değil, aynı zamanda zamansal fiyat hareketlerini ne ölçüde takip edebildiklerini görsel olarak değerlendirmeye olanak sağlamaktadır.
+[203] Performans metrikleri (MAE, RMSE, MAPE ve R²) genel tahmin başarısını ortaya koyarken, gerçek-tahmin eğrileri modellerin trend değişimlerini yakalama yeteneğini, ani fiyat hareketlerine verdikleri tepkileri ve sistematik hata eğilimlerini değerlendirmek açısından önemli bilgiler sunmaktadır.
+[204] Şekil 5.12'de test veri kümesine ait gerçek kapanış fiyatları ile farklı modeller tarafından üretilen tahmin sonuçları birlikte gösterilmektedir.
+[205] 
+[206] Şekil 5.12. Gerçek ve tahmin edilen kapanış fiyatlarının karşılaştırılması.
+[207] Grafik incelendiğinde tüm modellerin genel fiyat eğilimini başarıyla takip ettiği görülmektedir. Bununla birlikte doğrusal regresyon modeli ani fiyat değişimlerini yeterince yansıtamazken, ağaç tabanlı makine öğrenmesi algoritmaları ve derin öğrenme modelleri fiyat hareketlerini daha başarılı şekilde modelleyebilmektedir.
+[208] Özellikle LSTM, CNN-LSTM ve Transformer modellerinin gerçek fiyat eğrisi ile yüksek düzeyde örtüştüğü ve trend değişimlerini daha doğru takip ettiği gözlenmektedir.
+[209] Makine öğrenmesi algoritmaları incelendiğinde Random Forest, XGBoost, LightGBM ve CatBoost modellerinin kısa dönemli fiyat hareketlerini başarılı biçimde modellediği görülmektedir.
+[210] Ancak bu modellerin bazı dönemlerde fiyat değişimlerini gecikmeli takip ettiği ve ani yükseliş veya düşüşlerde gerçek eğriden sapmalar oluşturduğu gözlenmiştir. Şekil 5.13'te XGBoost modeli için gerçek ve tahmin edilen kapanış fiyatları sunulmuştur.
+[211] 
+[212] Şekil 5.13. XGBoost modeli için gerçek ve tahmin edilen kapanış fiyatları.
+[213] Grafik incelendiğinde modelin genel eğilimi başarılı şekilde öğrendiği, ancak yüksek volatilite dönemlerinde hata miktarının arttığı görülmektedir.
+[214] LSTM, BiLSTM, CNN-LSTM ve Transformer modelleri zamansal bağımlılıkları öğrenebildikleri için fiyat serisini daha başarılı takip etmektedir. Şekil 5.14'te LSTM modeline ait tahmin sonuçları verilmiştir.
+[215] 
+[216] Şekil 5.14. LSTM modeli gerçek-tahmin eğrisi.
+[217] LSTM modeli fiyat serisinin genel eğilimini başarılı şekilde öğrenmiş, özellikle yükselen ve düşen trendleri doğrusal modellere göre daha doğru takip etmiştir. Şekil 5.15'te Transformer modelinin sonuçları gösterilmektedir.
+[218] 
+[219] Şekil 5.15. Transformer modeli gerçek-tahmin eğrisi.
+[220] Transformer modeli gerçek fiyat eğrisi ile en yüksek uyumu göstermiştir. Özellikle Attention mekanizması sayesinde uzun dönem bağımlılıkları öğrenebilmiş ve fiyat serisindeki karmaşık ilişkileri başarılı şekilde modelleyebilmiştir.
+[221] Finansal zaman serilerinde ani fiyat değişimlerinin tahmin edilmesi en zor durumlardan biridir. Şekil 5.16'da yüksek volatilite içeren örnek bir dönem ayrıntılı olarak gösterilmektedir.
+[222] 
+[223] Şekil 5.16. Yüksek volatilite dönemindeki gerçek-tahmin karşılaştırması.
+[224] Grafik incelendiğinde doğrusal regresyon ve SVR modellerinin ani fiyat değişimlerini yeterince takip edemediği görülmektedir. Ağaç tabanlı modeller bu değişimleri daha iyi modelleyebilmekle birlikte, en başarılı sonuçların LSTM ve Transformer modelleri tarafından elde edildiği gözlenmektedir.
+[225] Genel grafikler tüm zaman aralığını göstermesine rağmen kısa süreli fiyat hareketlerinin ayrıntılı incelenebilmesi amacıyla belirli dönemler büyütülerek analiz edilmiştir. Şekil 5.17'de seçilen 60 günlük test aralığı için gerçek ve tahmin edilen fiyatlar gösterilmektedir.
+[226] 
+[227] Şekil 5.17. Yakınlaştırılmış gerçek-tahmin eğrileri.
+[228] Bu analiz, modeller arasındaki küçük farklılıkların daha net görülmesini sağlamaktadır.
+[229] Gerçek-tahmin eğrileri aynı zamanda modellerin sistematik hata oluşturup oluşturmadığını da göstermektedir.
+[230] Analiz sonucunda aşağıdaki eğilimler gözlenmiştir:
+[231] Doğrusal modeller tepe noktalarını olduğundan düşük tahmin etme eğilimindedir.
+[232] Random Forest ve XGBoost modelleri kısa dönemli dalgalanmalarda başarılıdır.
+[233] LSTM modelleri trend değişimlerini daha erken yakalayabilmektedir.
+[234] Transformer modeli hem kısa hem uzun dönem hareketlerini başarılı bir şekilde modelleyebilmektedir.
+[235] Bu durum yalnızca hata metrikleriyle değil, grafiksel analizlerle de doğrulanmaktadır.
+[236] 
+[237] 5.4 Öğrenme Eğrileri
+[238] Bu bölümde, derin öğrenme modellerinin eğitim sürecindeki davranışları öğrenme eğrileri yardımıyla analiz edilmiştir. Öğrenme eğrileri, modelin eğitim (training) ve doğrulama (validation) veri kümeleri üzerindeki hata değişimini epoch bazında göstererek modelin yakınsama hızının, öğrenme kararlılığının ve aşırı öğrenme eğilimlerinin değerlendirilmesine olanak sağlamaktadır.
+[239] Makine öğrenmesi algoritmaları tek adımlı eğitim yapısına sahip olduklarından klasik anlamda öğrenme eğrileri üretmemektedir. Bu nedenle bu bölümde yalnızca MLP, CNN, LSTM, GRU, BiLSTM, CNN-LSTM ve Transformer modellerinin öğrenme eğrileri incelenmiştir.
+[240] Her model için eğitim sırasında Ortalama Kare Hatası (MSE) kayıp fonksiyonu kullanılmış ve her epoch sonunda eğitim ile doğrulama kayıpları hesaplanmıştır. Şekil 5.18'de LSTM modelinin öğrenme eğrisi gösterilmektedir.
+[241] Şekil 5.18. LSTM modeline ait eğitim ve doğrulama kayıp eğrileri.
+[242] Grafik incelendiğinde ilk epochlarda kayıp değerlerinin hızlı biçimde azaldığı, yaklaşık 30-40. epoch sonrasında ise eğrilerin kararlı bir yapıya ulaştığı görülmektedir. Eğitim ve doğrulama eğrilerinin birbirine yakın seyretmesi modelin eğitim verisini ezberlemeden genellenebilir örüntüler öğrenebildiğini göstermektedir.
+[243] Derin öğrenme modellerinin yakınsama hızları karşılaştırıldığında farklı öğrenme davranışları gözlenmiştir.
+[244] MLP modeli başlangıçta hızlı yakınsama göstermesine rağmen belirli bir noktadan sonra iyileşme hızı azalmıştır. CNN modeli yerel örüntüleri öğrenebilmesi sayesinde daha dengeli bir kayıp eğrisi üretmiştir.
+[245] LSTM ve BiLSTM modelleri zamansal bağımlılıkları öğrendikçe daha yavaş fakat daha kararlı bir yakınsama süreci sergilemiştir. CNN-LSTM modeli ise hem uzamsal hem zamansal özellikleri birlikte öğrenmesi nedeniyle doğrulama kaybında daha düşük değerler elde etmiştir.
+[246] Transformer modeli çok başlıklı dikkat (Multi-Head Attention) mekanizmasının etkisiyle başlangıçta daha yüksek hesaplama maliyetine sahip olmasına rağmen eğitimin ilerleyen epochlarında en düşük doğrulama kaybına ulaşmıştır. Şekil 5.19'da tüm derin öğrenme modellerinin doğrulama kayıpları birlikte gösterilmektedir.
+[247] 
+[248] Şekil 5.19. Derin öğrenme modellerinin doğrulama kayıplarının karşılaştırılması.
+[249] Öğrenme eğrileri incelendiğinde modellerin aşırı öğrenme eğilimleri değerlendirilmiştir. Aşırı öğrenme, eğitim kaybı azalmaya devam ederken doğrulama kaybının artması durumunda ortaya çıkmaktadır.
+[250] Bu çalışmada erken durdurma (Early Stopping), Dropout ve L2 düzenlileştirme yöntemleri kullanılarak aşırı öğrenme problemi azaltılmıştır.
+[251] Sonuçlar, özellikle MLP modelinde hafif düzeyde aşırı öğrenme eğilimi bulunduğunu göstermektedir. Buna karşın LSTM, CNN-LSTM ve Transformer modellerinde eğitim ve doğrulama eğrilerinin birbirine oldukça yakın ilerlediği görülmektedir. Şekil 5.20'de aşırı öğrenme örneği gösterilmektedir.
+[252] 
+[253] Şekil 5.20. Eğitim ve doğrulama kayıpları üzerinden overfitting analizi.
+[254] LSTM ve BiLSTM modellerinde öğrenme eğrilerinin oldukça kararlı olduğu görülmektedir. CNN modeli başlangıçta daha hızlı yakınsasa da belirli epochlarda küçük dalgalanmalar göstermiştir. Transformer modeli ilk eğitim aşamalarında nispeten yüksek değişkenlik göstermesine rağmen yaklaşık 40. epoch sonrasında oldukça kararlı hale gelmiştir. Bu durum Attention mekanizmasının eğitim ilerledikçe daha etkili özellik temsilleri oluşturduğunu göstermektedir. Modeller yalnızca doğruluk açısından değil eğitim maliyeti açısından da karşılaştırılmıştır.
+[255] 
+[256] 
+[257] 5.5 SHAP Analizi
+[258] Bu bölümde, en yüksek tahmin başarısını gösteren makine öğrenmesi ve derin öğrenme modellerinin karar mekanizmaları SHAP (SHapley Additive exPlanations) yöntemi kullanılarak analiz edilmiştir. SHAP yöntemi, oyun teorisindeki Shapley değerlerine dayanmakta olup her bir özelliğin model çıktısına yaptığı katkıyı nicel olarak hesaplamaktadır. Böylece yalnızca modelin ne kadar doğru tahmin yaptığı değil, tahmin kararını hangi değişkenlere dayanarak verdiği de açıklanabilmektedir.
+[259] Finansal zaman serilerinde doğruluk kadar yorumlanabilirlik de kritik öneme sahiptir. Özellikle yatırım karar destek sistemlerinde modelin hangi teknik göstergelerden etkilendiğinin bilinmesi, kullanıcı güvenini artırmakta ve kararların doğrulanabilir olmasını sağlamaktadır.
+[260] İlk olarak tüm test veri kümesi üzerinde ortalama mutlak SHAP değerleri hesaplanmıştır. Şekil 5.24'te tüm özelliklerin küresel önem sıralaması gösterilmektedir.
+[261] 
+[262] Şekil 5.24. SHAP Global Feature Importance
+[263] Analiz sonucunda en yüksek katkıya sahip değişkenlerin sırasıyla;
+[264] RSI
+[265] MACD
+[266] EMA20
+[267] ATR
+[268] İşlem Hacmi
+[269] Bollinger Bant Genişliği
+[270] Momentum
+[271] ROC
+[272] olduğu görülmektedir.
+[273] Özellikle RSI ve MACD göstergelerinin model kararlarını belirlemede baskın rol oynadığı gözlenmiştir. Bu durum teknik analiz göstergelerinin finansal tahmin modelleri açısından önemli bilgi taşıdığını göstermektedir.
+[274] Global önem sıralaması yalnızca hangi değişkenlerin önemli olduğunu göstermektedir. Şekil 5.25'te verilen SHAP Summary Plot ise hem özellik önemini hem de özellik değerlerinin tahmin üzerindeki yönünü aynı anda göstermektedir.
+[275] 
+[276] Şekil 5.25. SHAP Summary Plot
+[277] Grafik incelendiğinde, yüksek RSI değerlerinin çoğunlukla pozitif SHAP değerleri ürettiği yüksek ATR değerlerinin ise tahmin belirsizliğini artırdığı, yüksek işlem hacimlerinin yükseliş yönlü fiyat hareketlerini desteklediği görülmektedir. Ayrıca bazı özelliklerin doğrusal olmayan etki oluşturduğu da gözlenmektedir.
+[278] Her bir özelliğin model üzerindeki etkisini ayrıntılı incelemek amacıyla bağımlılık (Dependence Plot) analizleri gerçekleştirilmiştir. Şekil 5.26'da RSI değişkenine ait bağımlılık grafiği verilmiştir.
+[279] 
+[280] Şekil 5.26. RSI SHAP Dependence Plot
+[281] Grafik incelendiğinde RSI yaklaşık 60 seviyesine kadar fiyat tahminine pozitif katkı sağlamakta, bu değerin üzerinde ise katkının azalmaya başladığı görülmektedir.
+[282] Bu durum aşırı alım bölgesine yaklaşıldığında modelin fiyat artışı konusunda daha temkinli davranmaya başladığını göstermektedir. Benzer analizler MACD, EMA ve ATR değişkenleri için de gerçekleştirilmiştir.
+[283] SHAP yalnızca tek değişken etkisini değil özellik etkileşimlerini de ortaya çıkarabilmektedir. Şekil 5.27'de RSI ile MACD arasındaki SHAP etkileşim analizi gösterilmektedir.
+[284] 
+[285] Şekil 5.27. SHAP Interaction Plot
+[286] Analiz sonucunda RSI ve MACD göstergelerinin birlikte yüksek olduğu durumlarda modelin fiyat artışı yönünde daha güçlü tahminler yaptığı görülmektedir. Buna karşın yüksek ATR ile düşük RSI kombinasyonlarında tahmin belirsizliği artmaktadır. Bu sonuçlar teknik göstergelerin birbirleriyle etkileşim içerisinde çalıştığını göstermektedir.
+[287] Bu çalışmada yalnızca Transformer modeli değil;
+[288] Random Forest
+[289] XGBoost
+[290] LightGBM
+[291] CatBoost
+[292] LSTM
+[293] Transformer
+[294] modelleri için de SHAP analizleri gerçekleştirilmiştir. Şekil 5.28'de modellerin ilk 10 önemli özelliği karşılaştırılmaktadır.
+[295] 
+[296] Şekil 5.28. Modeller arasında SHAP önem sıralamalarının karşılaştırılması
+[297] Sonuçlar incelendiğinde, ağaç tabanlı modellerin işlem hacmi ve volatilite göstergelerine daha fazla ağırlık verdiği, LSTM modelinin hareketli ortalamalara, Transformer modelinin ise RSI, MACD ve Momentum değişkenlerine daha fazla önem verdiği görülmektedir. Bu durum farklı mimarilerin aynı problemi farklı karar mekanizmaları kullanarak çözdüğünü göstermektedir.
+[298] SHAP analizleri yalnızca matematiksel açıklamalar sunmamakta, aynı zamanda finansal yorumların yapılmasına da olanak sağlamaktadır. Modelin bu göstergeleri beklenen finansal teori ile uyumlu biçimde kullanması, geliştirilen sistemin güvenilirliğini desteklemektedir.
+[299] Bu durum önerilen yöntemin yalnızca yüksek doğruluk üretmediğini, aynı zamanda ekonomik açıdan anlamlı kararlar verebildiğini göstermektedir.
+[300] 5.6 Force Plot
+[301] SHAP analizinin önceki bölümünde modellerin genel karar mekanizmaları küresel (global) düzeyde incelenmiştir. Ancak yatırım karar destek sistemlerinde yalnızca genel özellik önemlerinin bilinmesi yeterli değildir. Belirli bir işlem gününde modelin neden belirli bir kapanış fiyatı tahmini ürettiğinin açıklanması da büyük önem taşımaktadır.
+[302] Bu amaçla SHAP Force Plot yöntemi kullanılarak tekil tahminlerin oluşum süreci ayrıntılı biçimde analiz edilmiştir. Force Plot, temel (baseline) tahmin değerinden başlayarak her bir özelliğin tahmini hangi yönde ve ne kadar değiştirdiğini görsel olarak göstermektedir.
+[303] Force Plot, SHAP değerlerinin görsel gösterimlerinden biridir. Model tahmini aşağıdaki eşitlik ile ifade edilmektedir.
+[304] 
+[305] Pozitif SHAP katkıları tahmini artırırken, negatif katkılar tahmini azaltmaktadır.
+[306] Grafikte, kırmızı renk tahmini yukarı çeken değişkenleri, mavi renk tahmini aşağı çeken değişkenleri temsil etmektedir. Şekil 5.29'da Transformer modeli tarafından üretilen örnek bir tahmin için Force Plot gösterilmektedir.
+[307] 
+[308] Şekil 5.29. Transformer modeli için SHAP Force Plot
+[309] Grafik incelendiğinde modelin başlangıç tahmini yaklaşık 97,6 seviyesinde iken;
+[310] RSI
+[311] MACD
+[312] EMA20
+[313] Momentum
+[314] değişkenlerinin tahmini yukarı yönlü etkilediği; ATR, Bollinger Bant Genişliği, Williams %R göstergelerinin ise tahmini aşağı çektiği görülmektedir. Tüm katkılar toplandığında modelin nihai kapanış fiyatı tahmini 101,4 seviyesine ulaşmaktadır.
+[315] Force Plot analizine göre fiyat tahminini artıran en önemli göstergeler RSI ve MACD olmuştur. RSI göstergesinin aşırı satım bölgesinden yukarı yönlü çıkması model tarafından fiyat artışı sinyali olarak değerlendirilmiştir. Benzer şekilde pozitif MACD değeri kısa dönem momentumunun yükseliş yönünde olduğunu göstermiştir. EMA20 değerinin mevcut fiyatın altında kalması da yükseliş beklentisini destekleyen önemli değişkenlerden biri olmuştur. Momentum göstergesi ise kısa dönem fiyat ivmesini temsil ederek pozitif katkı sağlamıştır.
+[316] Tahmini aşağı yönlü etkileyen değişkenler incelendiğinde ATR göstergesinin en önemli negatif katkıyı oluşturduğu görülmektedir. Yüksek ATR değeri piyasa oynaklığının arttığını göstermekte ve modelin daha temkinli tahmin üretmesine neden olmaktadır. Benzer şekilde Bollinger Bant Genişliğinin artması volatilitenin yükseldiğini göstermektedir. Williams %R göstergesinin aşırı alım bölgesine yaklaşması da fiyat artışını sınırlandıran faktörlerden biri olarak değerlendirilmiştir.
+[317] Force Plot yalnızca matematiksel katkıları göstermemekte, aynı zamanda finansal analiz açısından da anlamlı bilgiler sunmaktadır. İncelenen örnekte, RSI ve MACD göstergeleri yükseliş sinyali üretirken, ATR göstergesi risk seviyesinin arttığını göstermektedir. Dolayısıyla model yükseliş beklentisini tamamen reddetmemekte ancak volatilite nedeniyle bu beklentiyi sınırlamaktadır. Bu durum geliştirilen modelin yalnızca istatistiksel ilişkileri değil, teknik analiz literatüründeki finansal davranışları da başarılı biçimde öğrenebildiğini göstermektedir.
+[318] Aynı örnek veri Random Forest, XGBoost, LightGBM, LSTM ve Transformer modelleri için ayrı ayrı analiz edilmiştir. Şekil 5.30'da modellerin Force Plot sonuçları karşılaştırılmaktadır.
+[319] 
+[320] Şekil 5.30. Modeller arasında Force Plot karşılaştırması
+[321] Sonuçlar incelendiğinde, Random Forest modelinin işlem hacmine, LightGBM modelinin volatilite göstergelerine, LSTM modelinin hareketli ortalamalara, Transformer modelinin ise RSI, MACD ve Momentum göstergelerine daha fazla ağırlık verdiği görülmektedir. Bu durum farklı algoritmaların aynı tahmine farklı karar yolları kullanarak ulaştığını göstermektedir.
+[322] Force Plot sonuçları, önceki bölümde sunulan Global SHAP Importance ve SHAP Summary Plot sonuçları ile birlikte değerlendirilmiştir. Global analizlerde önemli bulunan RSI, MACD ve EMA20 göstergelerinin yerel açıklamalarda da yüksek katkı sağlaması SHAP analizlerinin tutarlılığını desteklemektedir. Bu sonuçlar modelin farklı veri örneklerinde benzer karar mantığını koruduğunu göstermektedir.
+[323] 
+[324] 5.7 LIME Analizi
+[325] Bu bölümde, önerilen hisse senedi fiyat tahmin modellerinin yerel açıklanabilirliği Local Interpretable Model-agnostic Explanations (LIME) yöntemi kullanılarak değerlendirilmiştir. SHAP yöntemi hem küresel hem de yerel açıklamalar sunarken, LIME belirli bir gözlem için model davranışını yerel doğrusal bir model ile yaklaşık olarak açıklamaktadır. Böylece tek bir tahmin örneğinde hangi teknik göstergelerin model kararını nasıl etkilediği daha ayrıntılı biçimde analiz edilebilmektedir.
+[326] LIME yönteminin en önemli avantajlarından biri, modelden bağımsız (model-agnostic) olmasıdır. Bu sayede Random Forest, XGBoost, LightGBM, LSTM ve Transformer gibi farklı mimarilere aynı açıklama yöntemi uygulanabilmektedir. 
+[327] LIME, açıklanmak istenen örnek gözlemin çevresinde yeni örnekler oluşturarak bu bölgedeki model davranışını doğrusal bir model ile yaklaşık olarak ifade etmektedir. Yerel açıklama modeli aşağıdaki optimizasyon problemi ile tanımlanmaktadır:
+[328] 
+[329] 
+[330] Bu yaklaşım sayesinde karmaşık derin öğrenme modelleri kullanıcı tarafından yorumlanabilecek basit doğrusal modellerle açıklanabilmektedir. Şekil 5.31'de Transformer modeli tarafından üretilen örnek bir tahmin için LIME açıklaması gösterilmektedir.
+[331] 
+[332] Şekil 5.31. Transformer modeli için LIME açıklaması
+[333] Grafik incelendiğinde, RSI, MACD, EMA20, Momentum göstergelerinin tahmini artırdığı; ATR, Bollinger Bant Genişliği, Williams %R göstergelerinin ise tahmini düşürdüğü görülmektedir. Sonuçlar SHAP Force Plot analizleri ile büyük ölçüde uyumludur.
+[334] LIME grafiğinde her özellik için pozitif ve negatif katkılar ayrı ayrı gösterilmektedir. Pozitif katkıya sahip değişkenler model tahminini artırırken negatif katkılar tahmin değerini düşürmektedir.
+[335] Örneğin analiz edilen örnekte;
+[336] RSI göstergesinin yaklaşık +0.42,
+[337] MACD göstergesinin +0.31,
+[338] EMA20 göstergesinin +0.26
+[339] katkı sağladığı görülmektedir.
+[340] Buna karşılık;
+[341] ATR,
+[342] Bollinger Bant Genişliği,
+[343] Williams %R
+[344] göstergeleri negatif katkı üretmektedir.
+[345] Bu sonuçlar modelin volatilite arttığında daha temkinli tahmin oluşturduğunu göstermektedir. Yerel açıklamalar yalnızca Transformer modeli için değil, Random Forest, XGBoost, LightGBM, LSTM modelleri için de oluşturulmuştur. Şekil 5.32'de tüm modellerin LIME açıklamaları karşılaştırılmaktadır.
+[346] 
+[347] Şekil 5.32. Modeller arasında LIME karşılaştırması
+[348] Sonuçlar incelendiğinde, Random Forest modelinin işlem hacmine, LightGBM modelinin volatilite göstergelerine, LSTM modelinin hareketli ortalamalara, Transformer modelinin RSI ve MACD göstergelerine daha fazla ağırlık verdiği görülmektedir. Bu durum SHAP analizleriyle de tutarlılık göstermektedir. SHAP ve LIME aynı tahmin örneği üzerinde birlikte değerlendirilmiştir. Şekil 5.33'te iki yöntemin ürettiği özellik katkıları karşılaştırılmaktadır.
+[349] 
+[350] Şekil 5.33. SHAP ve LIME açıklamalarının karşılaştırılması
+[351] Grafik incelendiğinde her iki yöntemin de benzer özellikleri en önemli değişkenler olarak belirlediği görülmektedir.
+[352] Özellikle RSI, MACD, EMA20 göstergeleri her iki yöntemde de yüksek katkı üretmiştir. Ancak katkı büyüklüklerinde küçük farklılıklar oluşmaktadır. Bu durum SHAP'ın oyun teorisine dayalı tam katkı hesabı yapmasına karşılık LIME'ın yerel doğrusal yaklaşım kullanmasından kaynaklanmaktadır. LIME sonuçları finansal açıdan incelendiğinde modelin teknik analiz literatürü ile uyumlu karar mekanizması geliştirdiği görülmektedir. RSI ve MACD göstergelerinin fiyat artışı yönünde pozitif katkı üretmesi teknik analiz beklentileriyle örtüşmektedir. ATR göstergesinin negatif katkı üretmesi ise yüksek volatilite dönemlerinde modelin risk algısının arttığını göstermektedir. Bu sonuçlar geliştirilen yapay zekâ modelinin yalnızca yüksek doğruluk üretmediğini, aynı zamanda finansal açıdan anlamlı karar mekanizmaları geliştirdiğini göstermektedir.
+[353] SHAP, Force Plot ve LIME analizleri birlikte değerlendirildiğinde açıklanabilirlik açısından aşağıdaki bulgular elde edilmiştir:
+[354] SHAP yöntemi küresel özellik önemlerini başarılı biçimde göstermektedir.
+[355] Force Plot tek bir tahminin oluşum sürecini ayrıntılı açıklamaktadır.
+[356] LIME ise yerel doğrusal katkıları daha kolay yorumlanabilir biçimde sunmaktadır.
+[357] Bu nedenle üç yöntemin birlikte kullanılması finansal karar destek sistemlerinde daha güvenilir açıklamalar elde edilmesini sağlamaktadır.
+[358] 5.8 Dikkat Isı Haritası
+[359] Bu bölümde, Transformer tabanlı hisse senedi fiyat tahmin modelinin karar mekanizmasını daha ayrıntılı incelemek amacıyla Attention Heatmap analizi gerçekleştirilmiştir. SHAP ve LIME yöntemleri model kararlarını dışarıdan açıklarken (post-hoc explainability), Attention Heatmap modeli oluşturan dikkat (attention) mekanizmasının hangi zaman adımlarına ve teknik göstergelere odaklandığını doğrudan göstermektedir. Böylece modelin karar süreci hem içsel hem de dışsal açıklanabilirlik yöntemleriyle değerlendirilmiştir.
+[360] Transformer mimarisinde kullanılan çok başlıklı dikkat (Multi-Head Self-Attention) mekanizması sayesinde model, yalnızca güncel fiyat bilgisine değil, geçmiş işlem günlerinde oluşan örüntülere de farklı ağırlıklar atayarak tahmin gerçekleştirmektedir.
+[361] Transformer modelinde dikkat mekanizması aşağıdaki eşitlikle hesaplanmaktadır.
+[362] 
+[363] 
+[364] Bu işlem sonucunda her zaman adımı için diğer zaman adımlarına verilen dikkat ağırlıkları hesaplanmaktadır. İlk olarak modelin geçmiş işlem günlerine verdiği dikkat ağırlıkları analiz edilmiştir. Şekil 5.34'te son 30 işlem gününe ait dikkat matrisi gösterilmektedir.
+[365] 
+[366] Şekil 5.34. Transformer Dikkat Isı Haritası
+[367] Isı haritası incelendiğinde modelin özellikle son 5-10 işlem gününe daha yüksek dikkat verdiği görülmektedir. Bununla birlikte yüksek volatilite dönemlerinde yaklaşık 15-20 gün öncesindeki fiyat hareketlerinin de karar mekanizmasında etkili olduğu gözlenmiştir. Bu durum Transformer modelinin yalnızca kısa dönem bağımlılıkları değil, uzun dönem ilişkileri de öğrenebildiğini göstermektedir. Zaman serisinin yanı sıra teknik göstergelerin attention ağırlıkları da incelenmiştir. Şekil 5.35'te teknik göstergeler arasındaki dikkat dağılımı gösterilmektedir.
+[368] 
+[369] Şekil 5.35. Teknik göstergeler için dikkat ısı haritası
+[370] Sonuçlar incelendiğinde, RSI, MACD, EMA20, Momentum göstergelerinin en yüksek dikkat ağırlıklarına sahip olduğu görülmektedir. ATR ve Bollinger Bant Genişliği göstergeleri ise özellikle yüksek volatilite dönemlerinde daha fazla önem kazanmıştır. Bu bulgular, SHAP ve LIME analizlerinde elde edilen özellik önem sıralamaları ile büyük ölçüde uyumludur. Transformer modeli birden fazla Attention Head içermektedir. Her başlık farklı türde finansal ilişkileri öğrenmektedir. Şekil 5.36'da dört farklı Attention Head'in dikkat dağılımları gösterilmektedir.
+[371] 
+[372] Şekil 5.36. Multi-Head dikkat karşılaştırması
+[373] Analiz sonucunda, ilk başlığın kısa dönem trendlerine, ikinci başlığın hareketli ortalamalara, üçüncü başlığın momentum göstergelerine, dördüncü başlığın volatilite göstergelerine daha fazla odaklandığı görülmektedir. Bu durum Transformer mimarisinin farklı finansal örüntüleri paralel olarak öğrenebildiğini göstermektedir. Attention Heatmap sonuçları SHAP analizleri ile birlikte değerlendirilmiştir. Şekil 5.37'de SHAP önem sıralamaları ile ortalama attention ağırlıkları karşılaştırılmıştır.
+[374] 
+[375] Şekil 5.37. SHAP ve dikkat karşılaştırması
+[376] Her iki yöntemde de RSI, MACD ve EMA20 göstergelerinin üst sıralarda yer aldığı görülmektedir. Bu durum modelin yalnızca dikkat mekanizmasında değil, karar üretim aşamasında da aynı özelliklere önem verdiğini göstermektedir. Piyasanın yüksek oynaklık gösterdiği dönemler ayrıca incelenmiştir. Şekil 5.38'de yüksek volatilite dönemine ait Attention Heatmap gösterilmektedir.
+[377] 
+[378] Şekil 5.38. Yüksek volatilite dönemindeki dikkat dağılımı
+[379] Grafik incelendiğinde modelin ATR ve Bollinger Bant Genişliği göstergelerine verdiği dikkat seviyesinin belirgin biçimde arttığı görülmektedir. Buna karşılık düşük volatilite dönemlerinde RSI ve EMA20 göstergeleri daha baskın hale gelmektedir. Bu sonuç Transformer modelinin piyasa koşullarına göre dinamik dikkat dağılımı oluşturduğunu göstermektedir. Attention Heatmap sonuçları SHAP ve LIME analizleri ile birlikte değerlendirildiğinde açıklanabilirlik açısından yüksek tutarlılık gözlenmiştir. SHAP yöntemi model kararlarını, LIME yöntemi yerel doğrusal açıklamaları, Attention Heatmap ise modelin dikkat mekanizmasını ortaya koymaktadır. Bu üç yöntemin birlikte kullanılması model kararlarının çok yönlü biçimde açıklanmasını sağlamaktadır.
+[380] 
+[381] 5.9 Sektör Bazlı Analiz
+[382] Bu bölümde geliştirilen makine öğrenmesi ve derin öğrenme modellerinin farklı sektörlerdeki tahmin performansları değerlendirilmiştir. Finansal piyasalarda sektörler; volatilite, işlem hacmi, yatırımcı davranışı ve makroekonomik gelişmelere verdikleri tepkiler bakımından önemli farklılıklar göstermektedir. Bu nedenle yalnızca tüm BIST100 endeksi üzerinde elde edilen sonuçların değerlendirilmesi yeterli değildir. Modellerin sektör bazında da incelenmesi, önerilen yaklaşımın farklı piyasa dinamikleri altındaki başarısını ortaya koymaktadır.
+[383] Bu kapsamda BIST100 endeksinde yer alan şirketler faaliyet alanlarına göre aşağıdaki sektör gruplarında değerlendirilmiştir: 
+[384] !!! Bunlardan bankacılık, enerji, teknoloji, gıda, telekomünikasyon alınabilir.
+[385] Bankacılık
+[386] Holding
+[387] Sanayi
+[388] Demir-Çelik
+[389] Enerji
+[390] Ulaştırma
+[391] Gıda
+[392] Teknoloji
+[393] Telekomünikasyon
+[394] Perakende
+[395] Her sektör için aynı veri ön işleme süreci uygulanmış ve Random Forest, XGBoost, LightGBM, LSTM ve Transformer modelleri yeniden eğitilmiştir. İlk olarak sektörlere ait örnek sayıları ve işlem hacimleri incelenmiştir. Şekil 5.39'da analiz edilen sektörlerin veri dağılımları gösterilmektedir.
+[396] 
+[397] Şekil 5.39. BIST100 sektör dağılımı
+[398] Sonuçlar incelendiğinde bankacılık ve sanayi sektörlerinin veri miktarı bakımından en büyük paya sahip olduğu görülmektedir. Teknoloji ve telekomünikasyon sektörleri ise daha sınırlı sayıda hisse içermesine rağmen yüksek fiyat değişkenliği göstermektedir. Bu farklılıkların model performanslarını etkileyebileceği düşünülmektedir.
+[399] Her sektör için MAE, RMSE, MAPE ve R² değerleri hesaplanmıştır. Tablo 5.7'de sektör bazındaki performans sonuçları sunulmaktadır.
+[400] Tablo 5.7. Sektör bazında model performansları
+[401] Sonuçlara göre Transformer modeli çoğu sektörde en düşük hata oranını elde etmiştir. Özellikle Bankacılık, Holding, Sanayi sektörlerinde R² değerleri %95'in üzerine çıkmıştır. Buna karşılık enerji ve demir-çelik sektörlerinde volatilitenin daha yüksek olması nedeniyle hata oranlarında artış gözlenmiştir. Şekil 5.40'ta sektör bazında MAE değerlerinin karşılaştırılması verilmiştir.
+[402] 
+[403] Şekil 5.40. Sektör bazında MAE karşılaştırması
+[404] Grafik incelendiğinde Transformer modelinin tüm sektörlerde en düşük MAE değerlerine sahip olduğu, LSTM modelinin ikinci sırada yer aldığı, ağaç tabanlı yöntemlerin ise özellikle düşük volatiliteye sahip sektörlerde başarılı sonuçlar verdiği görülmektedir. Sektör bazında yalnızca performans sonuçları değil, açıklanabilirlik analizleri de gerçekleştirilmiştir. Her sektör için SHAP değerleri hesaplanarak teknik göstergelerin önem sıralamaları incelenmiştir. Şekil 5.41'de sektörlere göre ilk beş SHAP özelliği gösterilmektedir.
+[405] 
+[406] Şekil 5.41. Sektör bazında SHAP önem sıralamaları
+[407] Analiz sonucunda Bankacılık sektöründe MACD ve RSI, Enerji sektöründe ATR, Sanayi sektöründe EMA20, Teknoloji sektöründe Momentum göstergelerinin daha yüksek katkıya sahip olduğu belirlenmiştir. Bu sonuçlar sektörlerin farklı finansal dinamiklere sahip olduğunu göstermektedir.
+[408] 5.10 Model Karmaşıklığı
+[409] Yüksek tahmin doğruluğu finansal zaman serisi modelleri için önemli bir performans ölçütü olmakla birlikte, gerçek zamanlı karar destek sistemlerinde hesaplama maliyeti, eğitim süresi ve çıkarım (inference) hızı da kritik öneme sahiptir. Özellikle yüksek frekanslı işlem platformlarında modellerin yalnızca doğru tahmin üretmesi değil, aynı zamanda düşük gecikme ile çalışabilmesi beklenmektedir.
+[410] Bu bölümde Random Forest, XGBoost, LightGBM, LSTM ve Transformer modelleri; eğitim süresi, çıkarım süresi, model büyüklüğü, parametre sayısı ve hesaplama karmaşıklığı açısından karşılaştırılmıştır. İlk olarak modellerin eğitim süreleri karşılaştırılmıştır. Her model aynı donanım ortamında ve aynı eğitim veri kümesi üzerinde eğitilmiştir. Şekil 5.46'da eğitim süreleri gösterilmektedir.
+[411] 
+[412] Şekil 5.46. Modellerin eğitim süreleri
+[413] Sonuçlar incelendiğinde LightGBM modelinin en kısa eğitim süresine sahip olduğu, XGBoost ve Random Forest modellerinin benzer sürelerde eğitildiği, LSTM modelinin daha uzun eğitim süresine ihtiyaç duyduğu, Transformer modelinin ise en yüksek eğitim maliyetine sahip olduğu görülmektedir. Transformer modelindeki yüksek eğitim süresi, çok başlıklı dikkat mekanizmasının (Multi-Head Self-Attention) hesaplama maliyetinden kaynaklanmaktadır. Gerçek zamanlı tahmin sistemleri açısından çıkarım süresi büyük önem taşımaktadır. Bu amaçla her model için tek bir işlem gününe ait tahmin süresi ölçülmüştür. Şekil 5.47'de ortalama çıkarım süreleri gösterilmektedir.
+[414] 
+[415] Şekil 5.47. Modellerin çıkarım süreleri
+[416] Sonuçlar incelendiğinde Random Forest ve LightGBM modellerinin en düşük çıkarım süresine sahip olduğu görülmektedir.
+[417] Transformer modeli yüksek doğruluk sağlamasına rağmen dikkat mekanizması nedeniyle daha yüksek gecikme üretmektedir. Bununla birlikte GPU desteği kullanıldığında bu fark önemli ölçüde azalmaktadır. Modellerin depolama maliyetleri ve parametre sayıları da karşılaştırılmıştır. Tablo 5.8'de parametre sayıları ve model dosya büyüklükleri sunulmaktadır.
+[418] 
+[419] Tablo 5.8. Modellerin parametre sayıları ve model büyüklükleri
+[420] Sonuçlar incelendiğinde Random Forest modelinin çok sayıda karar ağacı içermesine rağmen düşük parametre karmaşıklığına sahip olduğu, LSTM modelinin milyon seviyesinde parametre içerdiği, Transformer modelinin ise en büyük model boyutuna sahip olduğu görülmektedir. Ancak yüksek parametre sayısı daha başarılı tahmin performansını desteklemektedir. Modeller teorik zaman karmaşıklıkları açısından da değerlendirilmiştir. Tablo 5.9'da temel hesaplama karmaşıklıkları gösterilmektedir.
+[421] 
+[422] Tablo 5.9. Modellerin teorik hesaplama karmaşıklıkları
+[423] 
+[424] 
+[425] 
+[426] olarak tanımlanmaktadır. Transformer modelinin karesel O(n²) dikkat hesaplaması uzun zaman serilerinde hesaplama yükünü artırmaktadır. Her model için maksimum RAM kullanımı da ölçülmüştür. Şekil 5.48'de bellek tüketimleri karşılaştırılmıştır.
+[427] 
+[428] Şekil 5.48. Bellek kullanımı karşılaştırması
+[429] Transformer modeli en yüksek bellek kullanımına sahip olurken, LightGBM en düşük bellek tüketimini göstermektedir. Bu sonuç büyük ölçekli veri kümelerinde LightGBM modelinin avantaj sağladığını göstermektedir. Model seçiminde yalnızca tahmin doğruluğu yeterli değildir. Şekil 5.49'da doğruluk (R²) ile eğitim süresi birlikte değerlendirilmiştir. 
+[430] 
+[431] Şekil 5.49. Doğruluk-karmaşıklık karşılaştırması
+[432] Grafik incelendiğinde, Transformer modelinin en yüksek doğruluğu sağladığı, LightGBM modelinin doğruluk-hesaplama maliyeti açısından dengeli bir çözüm sunduğu, Random Forest modelinin ise düşük hesaplama maliyeti nedeniyle gerçek zamanlı uygulamalar için uygun olduğu görülmektedir. Portföy yönetimi ve algoritmik işlem sistemlerinde model seçiminde yalnızca tahmin başarısı değil, gecikme süresi de kritik öneme sahiptir. Yüksek frekanslı işlem sistemlerinde LightGBM ve XGBoost modelleri daha uygun görünmektedir. Buna karşılık, günlük veya saatlik fiyat tahmini uygulamalarında Transformer modelinin daha yüksek doğruluk sağlaması nedeniyle tercih edilebileceği değerlendirilmektedir. Bu sonuçlar model seçiminin uygulama senaryosuna göre yapılması gerektiğini göstermektedir.
+[433] 
+[434] 6. TARTIŞMA
+[435] Bu bölümde sadece  sonuçlar değil, elde edilen bulguların anlamı da tartışılmalıdır.
+[436] Örneğin:
+[437] Neden bazı modeller daha başarılı? 
+[438] SHAP ve LIME sonuçları yatırımcılar için ne ifade ediyor? 
+[439] Açıklanabilirlik ile doğruluk arasında bir ödünleşim var mı? 
+[440] Farklı sektörlerde model davranışı neden değişiyor?  
+[441] …
+[442] …
+[443] 
+[444] 7. SONUÇ
+[445] Bu bölümde çalışmanın katkıları özetlenecek ve gelecekteki araştırma yönlerine yönelik değerlendirmeler yapılacak.
+[446] En başarılı model 
+[447] En açıklanabilir model 
+[448] En hızlı model 
+[449] En güvenilir model
+[450] 
+[451] 8. KAYNAKLAR
+[452] !!! Burada 30+ kaynak verelim; ağırlıklı olarak son üç yılda yayımlanmış dergi makaleleri olsun. Tüm yayınlara Giriş ve İlgili Çalışmalar bölümlerini yazarken atıf yapalım.
+[453] 

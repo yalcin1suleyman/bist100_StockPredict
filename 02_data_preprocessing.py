@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import os
 
 class DataPreprocessor:
-    def __init__(self, file_path, target_col='Close', date_col='Tarih', split_ratio=0.8, window_size=10):
+    def __init__(self, file_path, target_col='Close', date_col='Tarih', split_ratio=0.85, window_size=10):
         self.file_path = file_path
         self.target_col = target_col
         self.date_col = date_col
@@ -205,7 +205,7 @@ class DataPreprocessor:
 # Test için (eğer bu dosya doğrudan çalıştırılırsa)
 if __name__ == "__main__":
     file_path = "data/bist100_data_interpolate.csv"  # 29 Özellikli Veri Seti
-    preprocessor = DataPreprocessor(file_path=file_path, target_col='Close', split_ratio=0.8, window_size=10)
+    preprocessor = DataPreprocessor(file_path=file_path, target_col='Close', split_ratio=0.85, window_size=10)
     
     print("--- ML Verisi Test ---")
     X_train_ml, y_train_ml, X_test_ml, y_test_ml, y_test_unscaled_ml, scaler_y, f_cols = preprocessor.get_ml_data()

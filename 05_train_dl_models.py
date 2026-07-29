@@ -267,8 +267,9 @@ def train_and_evaluate_dl_models(file_path):
     seq_len = X_train_dl.shape[1]
     input_size = X_train_dl.shape[2]
     
-    # 10% validation split from training data
-    val_size = int(len(X_train_dl) * 0.1)
+    # %70 eğitim, %15 doğrulama, %15 test oranını sağlamak için
+    # %85'lik (eğitim+doğrulama) setinden 15/85 oranında doğrulama ayır
+    val_size = int(len(X_train_dl) * (15 / 85))
     
     X_train_t = torch.tensor(X_train_dl[:-val_size], dtype=torch.float32)
     y_train_t = torch.tensor(y_train_dl[:-val_size], dtype=torch.float32)

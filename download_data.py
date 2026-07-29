@@ -208,7 +208,7 @@ def generate_model_specific_files(df, suffix):
     
     for hisse, group in df.groupby('Hisse_Kodu'):
         group_copy = group.copy()
-        split_idx = int(len(group_copy) * 0.8)
+        split_idx = int(len(group_copy) * 0.85)  # %85 (Train+Val), %15 Test
         group_copy['Set'] = 'Train'
         group_copy.iloc[split_idx:, group_copy.columns.get_loc('Set')] = 'Test'
         dfs_to_concat.append(group_copy)
