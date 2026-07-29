@@ -1,6 +1,0 @@
-Karşılaştırılan Modeller: LightGBM (Makine Öğrenmesi) ve CNN-LSTM (Derin Öğrenme)
-
-1. Wilcoxon İşaretli Sıralar Testi p-değeri: 0.0000
-2. Diebold-Mariano Testi p-değeri: 0.0000
-
-Sonuç: İki modelin tahmin performansları arasında istatistiksel olarak anlamlı bir fark vardır (p < 0.05).
