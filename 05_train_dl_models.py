@@ -223,6 +223,9 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50
     best_model_state = None
     best_loss = float('inf')
     
+    train_loss_history = []
+    val_loss_history = []
+    
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -235,6 +238,9 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50
             optimizer.step()
             train_loss += loss.item() * batch_x.size(0)
             
+        train_loss = train_loss / len(train_loader.dataset)
+        train_loss_history.append(train_loss)
+            
         model.eval()
         val_loss = 0
         with torch.no_grad():
@@ -245,6 +251,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50
                 val_loss += loss.item() * batch_x.size(0)
                 
         val_loss = val_loss / len(val_loader.dataset)
+        val_loss_history.append(val_loss)
         
         if val_loss < best_loss:
             best_loss = val_loss
@@ -256,7 +263,8 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50
             
     if best_model_state is not None:
         model.load_state_dict(best_model_state)
-    return model
+    return model, train_loss_history, val_loss_history
+
 
 def train_and_evaluate_dl_models(file_path):
     print("--- 05: DERİN ÖĞRENME MODELLERİ (DL) [PyTorch] ---")
@@ -300,13 +308,21 @@ def train_and_evaluate_dl_models(file_path):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     criterion = nn.MSELoss()
     
+    # Yeni eklendi: Tum modellerin history'sini tutmak icin
+    all_train_histories = {}
+    all_val_histories = {}
+    
     for name, model in models.items():
         print(f"\n[{name}] modeli eğitiliyor...")
         optimizer = optim.Adam(model.parameters(), lr=0.001)
         
         start_time = time.time()
-        model = train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50)
+        model, train_history, val_history = train_model(model, train_loader, val_loader, criterion, optimizer, epochs=50)
         end_time = time.time()
+        
+        # History'yi kaydet
+        all_train_histories[name] = train_history
+        all_val_histories[name] = val_history
         
         # Prediction
         model.eval()
@@ -349,6 +365,14 @@ def train_and_evaluate_dl_models(file_path):
     pred_df = pd.DataFrame(predictions_dict)
     pred_df['Actual'] = y_test_unscaled
     pred_df.to_csv("outputs/dl_predictions.csv", index=False)
+    
+    import json
+    histories = {
+        'train': all_train_histories,
+        'val': all_val_histories
+    }
+    with open('outputs/dl_training_histories.json', 'w') as f:
+        json.dump(histories, f)
 
 if __name__ == "__main__":
     file_path = "data/bist100_data_interpolate.csv"

@@ -38,14 +38,14 @@ def run_shap_analysis(file_path):
     # 1. Klasik Grafikler
     plt.figure()
     shap.summary_plot(shap_values, X_test, feature_names=feature_names, plot_type="bar", show=False)
-    plt.title("Şekil 5.24. SHAP Global Feature Importance")
+    # plt.title("Şekil 5.24. SHAP Global Feature Importance") # Title removed per rules
     plt.tight_layout()
     plt.savefig("outputs/Fig_5_24_SHAP_Global_Feature_Importance.png", dpi=300)
     plt.close()
     
     plt.figure()
     shap.summary_plot(shap_values, X_test, feature_names=feature_names, show=False)
-    plt.title("Şekil 5.25. SHAP Summary Plot")
+    # plt.title("Şekil 5.25. SHAP Summary Plot") # Title removed per rules
     plt.tight_layout()
     plt.savefig("outputs/Fig_5_25_SHAP_Summary_Plot.png", dpi=300)
     plt.close()
