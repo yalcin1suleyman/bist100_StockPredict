@@ -1,0 +1,6 @@
+﻿Dosya,Bolum,Hisse_Kodu,Senaryo,Tarih_Baslangic,Tarih_Bitis,Basliksiz
+sekil_5_13_tum_modeller_gercek_tahmin.png,5.3,TUPRS.IS,scenario_3_all,2023-06-22,2024-12-31,True
+sekil_5_14_xgboost_gercek_tahmin.png,5.3,TUPRS.IS,scenario_3_all,2023-06-22,2024-12-31,True
+sekil_5_15_lstm_gercek_tahmin.png,5.3,TUPRS.IS,scenario_3_all,2023-07-10,2024-12-31,True
+sekil_5_16_transformer_gercek_tahmin.png,5.3,TUPRS.IS,scenario_3_all,2023-07-10,2024-12-31,True
+sekil_5_17_yuksek_volatilite_gercek_tahmin.png,5.3,TUPRS.IS,scenario_3_all,2023-09-01,2023-10-31,True

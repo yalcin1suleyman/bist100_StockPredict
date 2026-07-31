@@ -190,12 +190,19 @@ def make_feature_importance() -> None:
     path = TABLE_DIR / "table_5_1_preliminary_feature_importance.csv"
     if not path.exists():
         return
-    df = pd.read_csv(path).head(15)
+    all_df = pd.read_csv(path)
+    df = all_df.head(15)
     plt.figure(figsize=(9, 7))
     sns.barplot(data=df, y="Degisken", x="Onem", color="#3f7fbf")
     plt.xlabel("Onem")
     plt.ylabel("")
     save(OUT_DIR / "sekil_5_8_on_ozellik_onemi.png")
+
+    plt.figure(figsize=(9, 10))
+    sns.barplot(data=all_df, y="Degisken", x="Onem", color="#d7df01")
+    plt.xlabel("Ozellik Onemi (Gini Importance)")
+    plt.ylabel("")
+    save(OUT_DIR / "sekil_5_8_on_ozellik_onemi_tum_28.png")
 
 
 def make_performance_plots() -> None:
