@@ -1,27 +1,89 @@
-# BIST 100 Hisse Senedi Tahmini Projesi
+# BIST 100 Prediction Project
 
-Bu proje, BIST 100 hisse senetlerinin makine öğrenmesi algoritmalarıyla tahmin edilmesi ve bu tahminlerin Açıklanabilir Yapay Zeka (XAI) teknikleriyle yorumlanmasını amaçlar.
+Bu proje, makaledeki literatur taramasi ve yontem kurgusuna uygun olarak
+BIST 100 kapsamindan secilen 6 hisse icin uc ayri veri senaryosu uretir,
+modelleri egitir ve makaleye eklenebilir basliksiz grafikler ile tablo
+ciktilari olusturur.
 
-## 📁 Proje Dosya Yapısı
+## Temiz Proje Yapisi
 
-Proje karmaşıklığı önlemek adına 3 temel klasöre ve numaralandırılmış Python kodlarına bölünmüştür:
+```text
+bist100/
+  data/
+    bist100_ham_veri.csv
+    processed/
+  outputs/
+    figures/
+    predictions/
+    report/
+    tables/
+    xai/
+  src/
+    __init__.py
+    bist100_pipeline.py
+  run_pipeline.py
+  requirements.txt
+  README.md
+```
 
-### 1. Ana Dizin (Çalıştırılabilir Kodlar)
-Modelleri ve işlemleri çalıştırmak için bu numaralandırılmış dosyaları sırasıyla kullanabilirsiniz:
-- `download_data.py`: Yahoo Finance gibi kaynaklardan ham borsa ve sektör verilerini indirip `data/` klasörüne kaydeder.
-- `01_exploratory_data_analysis.py`: Keşifçi veri analizi (EDA) yapar, veriyi tanımak için grafikler çıkarır.
-- `02_data_preprocessing.py`: Verideki eksiklikleri giderir (ffill, bfill, interpolate) ve makine öğrenmesi için temiz bir alt yapı sunar.
-- `03_train_ml_models.py`: Belirlenen özellikleri (Ham, Teknik ve Tümü) senaryolar halinde kullanarak LightGBM, XGBoost, Random Forest gibi modelleri eğitir ve başarı oranlarını test eder.
-- `04_explainability_xai.py`: Eğitilen en iyi modellerin aldığı kararları SHAP ve LIME algoritmaları ile açıklayarak finansal gruplara göre (Makroekonomik, Volatilite vb.) analiz eder.
-- `05_train_dl_models.py`: Makine öğrenmesi modellerine ek olarak Derin Öğrenme (Deep Learning) modellerini eğitir ve değerlendirir.
-- `06_statistical_tests.py`: Modellerin tahmin başarıları arasındaki farkların istatistiksel olarak anlamlı olup olmadığını test eder.
+## Calisma Donemi
 
-### 2. `data/` (Veri Setleri)
-Projenin tüm girdileri ve ön işlemden geçmiş veri setleri burada saklanır:
-- `bist100_ham_veri.csv`
-- `bist100_data_interpolate.csv` (Modellerin kullandığı ana işlenmiş veri) vb.
+Makaledeki `01.01.2015 ve 01.01.2025 tarihleri arasi` ifadesi kodda
+acik bicimde su sekilde uygulanir:
 
-### 3. `outputs/` (Grafikler ve Sonuçlar)
-Kodları çalıştırdığınızda üretilen **tüm grafikler (Fig_...)** ve **başarı tabloları (Table_...)** otomatik olarak bu klasöre kaydedilir. Ana dizin kalabalıklaşmaz.
-- Örnek: `Table_5_2_ML_Performance_Scenarios.csv` (Senaryo analiz sonuçları)
-- Örnek: `Fig_5_28_SHAP_Grouped_Importance.png` (Gruplandırılmış SHAP sonuçları)
+- Baslangic dahil: `2015-01-01`
+- Bitis haric: `2025-01-01`
+- Beklenen son gozlem: `2024-12-31`
+
+Pipeline bu tarih araligini manifest dosyasina yazar ve ham veri bu kapsami
+saglamazsa hata verir.
+
+## Hisse Kapsami
+
+Calisma yalnizca makalede belirtilen 6 hisseyi kullanir:
+
+`AKBNK.IS`, `BIMAS.IS`, `EREGL.IS`, `GARAN.IS`, `THYAO.IS`, `TUPRS.IS`
+
+Ham veride bu hisselerden biri eksikse pipeline hata verir. Kapsam disi hisse
+varsa filtrelenir.
+
+## Veri Senaryolari
+
+Pipeline ham veriden baslar ve 28 ozellik uretir.
+
+- Senaryo 1: 7 temel/makro ozellik
+  `Open, High, Low, Close, Volume, USD_TRY, VIX`
+- Senaryo 2: 21 turetilmis/teknik ozellik
+  `Gunluk_Getiri` ve teknik gostergeler
+- Senaryo 3: Tum 28 ozellik
+
+Bolme islemi her hisse icinde kronolojik olarak yapilir:
+
+- Egitim: %70
+- Dogrulama: %15
+- Test: %15
+
+## Calistirma
+
+```powershell
+python run_pipeline.py
+```
+
+Daha hizli kontrol icin:
+
+```powershell
+python run_pipeline.py --epochs 8 --quick
+```
+
+## Uretilen Ciktilar
+
+- `data/processed/`: temiz 28 ozellikli veri ve 3 senaryo CSV dosyasi
+- `outputs/tables/`: eksik veri, tanimlayici istatistik, model sonuclari,
+  istatistiksel test ve karmasiklik tablolari
+- `outputs/figures/`: makaleye basliksiz eklenebilir grafikler
+- `outputs/predictions/`: test tahminleri
+- `outputs/xai/`: ozellik onemi, SHAP/LIME/PDP destek ciktisi
+- `outputs/report/pipeline_manifest.json`: calisma ozeti
+
+Grafiklerin uzerinde baslik yoktur; makalede altlarina Sekil vb. aciklama
+eklenmesi icin hazirlanmistir.

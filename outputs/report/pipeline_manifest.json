@@ -1,0 +1,211 @@
+{
+  "raw_file": "C:\\Users\\asusl\\Desktop\\bist100\\data\\bist100_ham_veri.csv",
+  "raw_shape": [
+    15330,
+    9
+  ],
+  "feature_shape": [
+    15330,
+    34
+  ],
+  "feature_date_min": "2015-01-01",
+  "feature_date_max": "2024-12-31",
+  "model_input_date_max": "2024-12-30",
+  "prediction_target_date_max": "2024-12-31",
+  "study_start_inclusive": "2015-01-01",
+  "study_end_exclusive": "2025-01-01",
+  "expected_last_observation": "2024-12-31",
+  "stocks": [
+    "AKBNK.IS",
+    "BIMAS.IS",
+    "EREGL.IS",
+    "GARAN.IS",
+    "THYAO.IS",
+    "TUPRS.IS"
+  ],
+  "expected_stocks": [
+    "AKBNK.IS",
+    "BIMAS.IS",
+    "EREGL.IS",
+    "GARAN.IS",
+    "THYAO.IS",
+    "TUPRS.IS"
+  ],
+  "feature_count": 28,
+  "basic_feature_count": 7,
+  "derived_feature_count": 21,
+  "scenarios": {
+    "scenario_1_basic": [
+      "Open",
+      "High",
+      "Low",
+      "Close",
+      "Volume",
+      "USD_TRY",
+      "VIX"
+    ],
+    "scenario_2_derived": [
+      "Gunluk_Getiri",
+      "Volatilite_10",
+      "MA_10",
+      "MA_50",
+      "Momentum_10",
+      "RSI_14",
+      "MACD",
+      "MACD_Signal",
+      "MACD_Histogram",
+      "EMA_20",
+      "ATR_14",
+      "BB_Upper",
+      "BB_Lower",
+      "BB_Width",
+      "ADX_14",
+      "CCI_20",
+      "Williams_R",
+      "OBV",
+      "Stoch_K",
+      "Stoch_D",
+      "VWAP"
+    ],
+    "scenario_3_all": [
+      "Open",
+      "High",
+      "Low",
+      "Close",
+      "Volume",
+      "USD_TRY",
+      "VIX",
+      "Gunluk_Getiri",
+      "Volatilite_10",
+      "MA_10",
+      "MA_50",
+      "Momentum_10",
+      "RSI_14",
+      "MACD",
+      "MACD_Signal",
+      "MACD_Histogram",
+      "EMA_20",
+      "ATR_14",
+      "BB_Upper",
+      "BB_Lower",
+      "BB_Width",
+      "ADX_14",
+      "CCI_20",
+      "Williams_R",
+      "OBV",
+      "Stoch_K",
+      "Stoch_D",
+      "VWAP"
+    ]
+  },
+  "split_counts": [
+    {
+      "Hisse_Kodu": "AKBNK.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "AKBNK.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "AKBNK.IS",
+      "Set": "Validation",
+      "n": 383
+    },
+    {
+      "Hisse_Kodu": "BIMAS.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "BIMAS.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "BIMAS.IS",
+      "Set": "Validation",
+      "n": 383
+    },
+    {
+      "Hisse_Kodu": "EREGL.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "EREGL.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "EREGL.IS",
+      "Set": "Validation",
+      "n": 383
+    },
+    {
+      "Hisse_Kodu": "GARAN.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "GARAN.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "GARAN.IS",
+      "Set": "Validation",
+      "n": 383
+    },
+    {
+      "Hisse_Kodu": "THYAO.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "THYAO.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "THYAO.IS",
+      "Set": "Validation",
+      "n": 383
+    },
+    {
+      "Hisse_Kodu": "TUPRS.IS",
+      "Set": "Test",
+      "n": 384
+    },
+    {
+      "Hisse_Kodu": "TUPRS.IS",
+      "Set": "Train",
+      "n": 1788
+    },
+    {
+      "Hisse_Kodu": "TUPRS.IS",
+      "Set": "Validation",
+      "n": 383
+    }
+  ],
+  "ml_models": [
+    "CatBoost",
+    "LightGBM",
+    "Linear Regression",
+    "Random Forest",
+    "SVR",
+    "XGBoost"
+  ],
+  "dl_models": [
+    "BiLSTM",
+    "CNN",
+    "CNN-LSTM",
+    "GRU",
+    "LSTM",
+    "MLP",
+    "Transformer"
+  ],
+  "figures_have_titles": false
+}
